@@ -16,6 +16,7 @@ import {
   HeartPulse,
   Instagram,
   LogOut,
+  Moon,
   PackageCheck,
   Pill,
   Plus,
@@ -341,7 +342,7 @@ async function askSahilGemini(userText, history, userContext) {
  */
 function WebAppShell({ children, toasts = [] }) {
   return (
-    <div className="flex min-h-screen flex-col bg-[#F4F7F5] text-[#1A2B24] antialiased">
+    <div className="flex min-h-screen flex-col bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#1A2B24] dark:text-[#F1F5F3] dark:bg-[#0B0F0E] dark:text-[#F1F5F3] antialiased">
       {children}
 
       {/* Floating Toast Stack */}
@@ -357,8 +358,8 @@ function WebAppShell({ children, toasts = [] }) {
                 t.type === "error"
                   ? "border-[#F5C6BA] bg-[#FDF6F4] text-[#9C331C]"
                   : t.type === "info"
-                  ? "border-[#DCE5DF] bg-white text-[#1A2B24]"
-                  : "border-[#BFE3D3] bg-[#163A2E] text-white"
+                  ? "border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] text-[#1A2B24] dark:text-[#F1F5F3]"
+                  : "border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#163A2E] dark:bg-[#0F1713] text-white"
               }`}
             >
               <CircleCheck size={15} className="shrink-0" />
@@ -388,12 +389,12 @@ function SignInScreen({
 }) {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-6">
-      <div className="grid w-full grid-cols-1 overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-xl lg:grid-cols-12">
+      <div className="grid w-full grid-cols-1 overflow-hidden rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] shadow-xl lg:grid-cols-12">
         {/* Left Brand Showcase */}
-        <div className="flex flex-col justify-between bg-[#163A2E] p-8 text-white sm:p-10 lg:col-span-6">
+        <div className="flex flex-col justify-between bg-[#163A2E] dark:bg-[#0F1713] p-8 text-white sm:p-10 lg:col-span-6">
           <div>
             <div className="inline-flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs">
                 <ShieldCheck size={20} />
               </span>
               <div className="flex flex-col leading-tight">
@@ -432,14 +433,14 @@ function SignInScreen({
 
         {/* Right Authentication Form */}
         <div className="flex flex-col justify-center p-8 sm:p-10 lg:col-span-6">
-          <div className="mb-6 flex rounded-2xl bg-[#F4F7F5] p-1">
+          <div className="mb-6 flex rounded-2xl bg-[#F4F7F5] dark:bg-[#0B0F0E] p-1">
             <button
               type="button"
               onClick={() => setAuthMode("signin")}
               className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
                 authMode === "signin"
-                  ? "bg-white text-[#1A2B24] shadow-2xs"
-                  : "text-[#5E736A]"
+                  ? "bg-white dark:bg-[#131A16] text-[#1A2B24] dark:text-[#F1F5F3] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399]"
               }`}
             >
               Sign in
@@ -449,8 +450,8 @@ function SignInScreen({
               onClick={() => setAuthMode("signup")}
               className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
                 authMode === "signup"
-                  ? "bg-white text-[#1A2B24] shadow-2xs"
-                  : "text-[#5E736A]"
+                  ? "bg-white dark:bg-[#131A16] text-[#1A2B24] dark:text-[#F1F5F3] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399]"
               }`}
             >
               Create account
@@ -459,7 +460,7 @@ function SignInScreen({
 
           <form onSubmit={(e) => void submitAuth(e)} className="space-y-4">
             <div>
-              <label htmlFor="auth-email" className="block text-xs font-bold text-[#3E4C59]">
+              <label htmlFor="auth-email" className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                 Email address
               </label>
               <input
@@ -469,14 +470,14 @@ function SignInScreen({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="arjun@example.com"
-                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-3 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-3 text-xs font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
               />
             </div>
 
             <div>
               <label
                 htmlFor="auth-password"
-                className="block text-xs font-bold text-[#3E4C59]"
+                className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
               >
                 Password
               </label>
@@ -488,14 +489,14 @@ function SignInScreen({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-3 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-3 text-xs font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
               />
             </div>
 
             <button
               type="submit"
               disabled={authBusy}
-              className="w-full rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] disabled:opacity-60"
+              className="w-full rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] disabled:opacity-60"
             >
               {authBusy
                 ? "Please wait…"
@@ -505,7 +506,7 @@ function SignInScreen({
             </button>
           </form>
 
-          <div className="my-5 flex items-center gap-3 text-[11px] font-bold text-[#72877E]">
+          <div className="my-5 flex items-center gap-3 text-[11px] font-bold text-[#72877E] dark:text-[#7D9489]">
             <span className="h-px flex-1 bg-[#EAEFEA]" />
             <span>OR CONTINUE WITH</span>
             <span className="h-px flex-1 bg-[#EAEFEA]" />
@@ -516,9 +517,9 @@ function SignInScreen({
               type="button"
               disabled={authBusy}
               onClick={() => void signInWithGoogle()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] bg-white py-3 text-xs font-bold text-[#1A2B24] transition hover:bg-[#F4F7F5]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] py-3 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
             >
-              <UserCheck size={15} className="text-[#388E6C]" />
+              <UserCheck size={15} className="text-[#388E6C] dark:text-[#00E599]" />
               <span>Continue with Google</span>
             </button>
 
@@ -526,9 +527,9 @@ function SignInScreen({
               type="button"
               disabled={authBusy}
               onClick={() => void signInAsGuest()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#BFE3D3] bg-[#E3F2EC]/70 py-3 text-xs font-bold text-[#163A2E] transition hover:bg-[#E3F2EC]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 py-3 text-xs font-bold text-[#163A2E] transition hover:bg-[#E3F2EC] dark:bg-[#00E599]/15"
             >
-              <Sparkles size={15} className="text-[#388E6C]" />
+              <Sparkles size={15} className="text-[#388E6C] dark:text-[#00E599]" />
               <span>Continue as Instant Guest</span>
             </button>
           </div>
@@ -670,15 +671,15 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-2xl flex-col justify-center px-4 py-8 sm:px-6">
-      <div className="overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-xl">
+      <div className="overflow-hidden rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] shadow-xl">
         {/* Top Progress Header with Prominent Skip Option */}
-        <div className="border-b border-[#EAEFEA] bg-[#F9FBFA] px-6 py-4 sm:px-8">
+        <div className="border-b border-[#EAEFEA] dark:border-[#1B2922] bg-[#F9FBFA] dark:bg-[#17201C] px-6 py-4 sm:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E3F2EC] text-[#388E6C]">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599]">
                 <Sparkles size={13} />
               </span>
-              <span className="text-xs font-bold tracking-wide text-[#5E736A]">
+              <span className="text-xs font-bold tracking-wide text-[#5E736A] dark:text-[#8EA399]">
                 Step {step + 1} of {TOTAL_STEPS}
               </span>
             </div>
@@ -687,7 +688,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
               type="button"
               disabled={submitting}
               onClick={() => void handleSkipNow()}
-              className="rounded-xl px-3 py-1.5 text-xs font-bold text-[#5E736A] transition hover:bg-[#EAEFEA] hover:text-[#1A2B24] disabled:opacity-50"
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] transition hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25] hover:text-[#1A2B24] dark:text-[#F1F5F3] disabled:opacity-50"
             >
               Skip for now →
             </button>
@@ -695,7 +696,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
 
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#E4ECE7]">
             <div
-              className="h-full rounded-full bg-[#388E6C] transition-all duration-300"
+              className="h-full rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -706,20 +707,20 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
           {step === 0 && (
             <div className="space-y-6">
               <div>
-                <span className="inline-block rounded-full bg-[#E3F2EC] px-3 py-1 text-[11px] font-bold text-[#276B50]">
+                <span className="inline-block rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 px-3 py-1 text-[11px] font-bold text-[#276B50] dark:text-[#00E599]">
                   Welcome to Dosemate · Powered by Man Matters 👋
                 </span>
-                <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-[#1A2B24] sm:text-3xl">
+                <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3] sm:text-3xl">
                   Let&apos;s personalize your journey.
                 </h1>
-                <p className="mt-1.5 text-sm text-[#5E736A]">
+                <p className="mt-1.5 text-sm text-[#5E736A] dark:text-[#8EA399]">
                   First, what should we call you?
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="sm:col-span-2">
-                  <label htmlFor="onb-name" className="block text-xs font-bold text-[#3E4C59]">
+                  <label htmlFor="onb-name" className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                     First name
                   </label>
                   <input
@@ -730,12 +731,12 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Arjun"
-                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-4 py-3 text-sm font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="onb-age" className="block text-xs font-bold text-[#3E4C59]">
+                  <label htmlFor="onb-age" className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                     Age
                   </label>
                   <input
@@ -746,7 +747,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                     required
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-4 py-3 text-sm font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
                   />
                 </div>
               </div>
@@ -756,10 +757,10 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
                   What&apos;s your main focus right now{fullName ? `, ${fullName.split(" ")[0]}` : ""}?
                 </h2>
-                <p className="mt-1 text-xs text-[#5E736A]">Pick one or more goals.</p>
+                <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">Pick one or more goals.</p>
               </div>
 
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -772,14 +773,14 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleConcern(item)}
                       className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-xs font-bold transition ${
                         active
-                          ? "border-[#388E6C] bg-[#E3F2EC] text-[#163A2E] shadow-2xs"
-                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#485C53] hover:bg-[#F4F7F5]"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] shadow-2xs"
+                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                       }`}
                     >
                       <span>{item}</span>
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                          active ? "bg-[#388E6C] text-white" : "border border-[#CFD8D3] bg-white"
+                          active ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold" : "border border-[#CFD8D3] dark:border-[#2A3F34] bg-white dark:bg-[#131A16]"
                         }`}
                       >
                         {active && <Check size={12} />}
@@ -794,16 +795,16 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
                   Quick hair &amp; lifestyle check
                 </h2>
-                <p className="mt-1 text-xs text-[#5E736A]">
+                <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
                   Helps Dosemate AI tailor daily tips for you.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">Hair stage</label>
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">Hair stage</label>
                 <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {HAIR_STAGES.map((stage) => (
                     <button
@@ -812,12 +813,12 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => setHairStage(stage)}
                       className={`flex items-center justify-between rounded-2xl border px-3.5 py-3 text-left text-xs font-bold transition ${
                         hairStage === stage
-                          ? "border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
-                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
+                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                       }`}
                     >
                       <span>{stage}</span>
-                      {hairStage === stage && <Check size={14} className="shrink-0 text-[#388E6C]" />}
+                      {hairStage === stage && <Check size={14} className="shrink-0 text-[#388E6C] dark:text-[#00E599]" />}
                     </button>
                   ))}
                 </div>
@@ -825,7 +826,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
 
               <div className="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-bold text-[#3E4C59]">Nightly sleep</label>
+                  <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">Nightly sleep</label>
                   <div className="mt-1.5 grid grid-cols-3 gap-1.5">
                     {["< 6 hrs", "6–7 hrs", "7–8+ hrs"].map((opt) => (
                       <button
@@ -834,8 +835,8 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                         onClick={() => setSleepHours(opt)}
                         className={`rounded-xl py-2.5 text-xs font-bold transition ${
                           sleepHours === opt
-                            ? "bg-[#388E6C] text-white"
-                            : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A]"
+                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399]"
                         }`}
                       >
                         {opt}
@@ -845,7 +846,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#3E4C59]">Stress level</label>
+                  <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">Stress level</label>
                   <div className="mt-1.5 grid grid-cols-3 gap-1.5">
                     {["Low", "Moderate", "High"].map((opt) => (
                       <button
@@ -854,8 +855,8 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                         onClick={() => setStressLevel(opt)}
                         className={`rounded-xl py-2.5 text-xs font-bold transition ${
                           stressLevel === opt
-                            ? "bg-[#388E6C] text-white"
-                            : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A]"
+                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399]"
                         }`}
                       >
                         {opt}
@@ -870,10 +871,10 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
                   Using any supplements or tonics already?
                 </h2>
-                <p className="mt-1 text-xs text-[#5E736A]">
+                <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
                   We&apos;ll set up your daily dose trackers automatically.
                 </p>
               </div>
@@ -888,16 +889,16 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleProduct(preset.name)}
                       className={`flex items-center justify-between gap-2 rounded-2xl border p-3 text-left text-xs font-bold transition ${
                         checked
-                          ? "border-[#388E6C] bg-[#E3F2EC]/70 text-[#163A2E]"
-                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-white"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 text-[#163A2E]"
+                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-white dark:bg-[#131A16]"
                       }`}
                     >
                       <span className="line-clamp-1">{preset.name}</span>
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
                           checked
-                            ? "bg-[#388E6C] text-white"
-                            : "border border-[#D5DCE4] bg-white"
+                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            : "border border-[#D5DCE4] dark:border-[#25382E] bg-white dark:bg-[#131A16]"
                         }`}
                       >
                         {checked && <Check size={12} />}
@@ -913,10 +914,10 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       key={customName}
                       type="button"
                       onClick={() => toggleProduct(customName)}
-                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] bg-[#E3F2EC]/70 p-3 text-left text-xs font-bold text-[#163A2E]"
+                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-3 text-left text-xs font-bold text-[#163A2E]"
                     >
                       <span className="line-clamp-1">{customName}</span>
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] text-white">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
                         <Check size={12} />
                       </span>
                     </button>
@@ -935,12 +936,12 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                     }
                   }}
                   placeholder="+ Add custom product..."
-                  className="flex-1 rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C] focus:bg-white"
+                  className="flex-1 rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#1A2B24] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
                 />
                 <button
                   type="button"
                   onClick={handleAddCustomProduct}
-                  className="rounded-xl border border-[#388E6C] bg-[#E3F2EC] px-4 py-2 text-xs font-bold text-[#276B50] transition hover:bg-[#388E6C] hover:text-white"
+                  className="rounded-xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 px-4 py-2 text-xs font-bold text-[#276B50] dark:text-[#00E599] transition hover:bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] hover:text-white"
                 >
                   Add
                 </button>
@@ -951,16 +952,16 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
                   When should we remind you?
                 </h2>
-                <p className="mt-1 text-xs text-[#5E736A]">
+                <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
                   Consistency is key—pick a goal horizon and daily reminder time.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">Goal timeline</label>
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">Goal timeline</label>
                 <div className="mt-2 grid grid-cols-3 gap-2.5">
                   {["8 Weeks", "12 Weeks", "24 Weeks"].map((goal) => (
                     <button
@@ -969,8 +970,8 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => setGoalHorizon(goal)}
                       className={`rounded-2xl py-3 text-xs font-bold transition ${
                         goalHorizon === goal
-                          ? "bg-[#388E6C] text-white shadow-2xs"
-                          : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                          ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                          : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                       }`}
                     >
                       {goal}
@@ -980,7 +981,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
               </div>
 
               <div>
-                <label htmlFor="onb-time" className="block text-xs font-bold text-[#3E4C59]">
+                <label htmlFor="onb-time" className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                   Morning dose reminder
                 </label>
                 <input
@@ -988,19 +989,19 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                   type="time"
                   value={preferredReminder}
                   onChange={(e) => setPreferredReminder(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-bold text-[#141A21] outline-none focus:border-[#388E6C] focus:bg-white"
+                  className="mt-2 w-full rounded-2xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-4 py-3 text-sm font-bold text-[#141A21] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
                 />
               </div>
             </div>
           )}
 
           {/* Step Navigation Footer */}
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-[#EAEFEA] pt-5">
+          <div className="mt-8 flex items-center justify-between gap-3 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-5">
             {step > 0 ? (
               <button
                 type="button"
                 onClick={() => setStep((s) => Math.max(0, s - 1))}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-4 py-3 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-4 py-3 text-xs font-bold text-[#485C53] dark:text-[#B8CCC2] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
               >
                 <ArrowLeft size={15} />
                 <span>Back</span>
@@ -1012,7 +1013,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#388E6C] px-6 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#2E775A] active:scale-[0.98] disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] px-6 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] active:scale-[0.98] disabled:opacity-60"
             >
               <span>
                 {submitting
@@ -1121,21 +1122,21 @@ function HairCheckupPage({
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-3 border-b border-[#DCE5DF] pb-5 sm:flex-row sm:items-end">
+      <div className="flex flex-col justify-between gap-3 border-b border-[#DCE5DF] dark:border-[#22332A] pb-5 sm:flex-row sm:items-end">
         <div>
-          <span className="rounded-md bg-[#E3F2EC] px-2.5 py-1 text-[11px] font-bold text-[#388E6C]">
+          <span className="rounded-md bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2.5 py-1 text-[11px] font-bold text-[#388E6C] dark:text-[#00E599]">
             DAY {currentJourneyDay} HAIR JOURNEY
           </span>
-          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3] sm:text-3xl">
             Hair Growth &amp; Condition Checkup
           </h1>
-          <p className="mt-1 text-sm text-[#5E736A]">
+          <p className="mt-1 text-sm text-[#5E736A] dark:text-[#8EA399]">
             Log daily hair fall, thickness feel, and visual snapshots to track real changes over time.
           </p>
         </div>
-        <div className="rounded-2xl border border-[#DCE5DF] bg-white px-4 py-2.5 text-xs font-semibold text-[#3E4C59]">
-          Primary Regimen: <strong className="text-[#1A2B24]">{primaryGummyName}</strong> ·{" "}
-          <span className="text-[#388E6C]">{totalGummiesConsumed} doses logged</span>
+        <div className="rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-4 py-2.5 text-xs font-semibold text-[#3E4C59] dark:text-[#A0B4AA]">
+          Primary Regimen: <strong className="text-[#1A2B24] dark:text-[#F1F5F3]">{primaryGummyName}</strong> ·{" "}
+          <span className="text-[#388E6C] dark:text-[#00E599]">{totalGummiesConsumed} doses logged</span>
         </div>
       </div>
 
@@ -1143,29 +1144,29 @@ function HairCheckupPage({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Left Column: Daily Check-In Questions & Photo Capture */}
         <div className="lg:col-span-6">
-          <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+          <div className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span
                   className={`flex h-10 w-10 items-center justify-center rounded-2xl font-bold ${
-                    todayLogged ? "bg-[#388E6C] text-white" : "bg-[#FDF2D8] text-[#B87D14]"
+                    todayLogged ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold" : "bg-[#FDF2D8] text-[#B87D14]"
                   }`}
                 >
                   {todayLogged ? <Check size={18} /> : <Camera size={18} />}
                 </span>
                 <div>
-                  <h2 className="text-base font-bold text-[#1A2B24]">
+                  <h2 className="text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {todayLogged
                       ? "Today's checkup is logged"
                       : "Today's Condition & Photo Checkup"}
                   </h2>
-                  <p className="text-xs text-[#5E736A]">
+                  <p className="text-xs text-[#5E736A] dark:text-[#8EA399]">
                     Answer 4 quick questions to record today&apos;s hair response
                   </p>
                 </div>
               </div>
               {todayLogged && (
-                <span className="rounded-full bg-[#E3F2EC] px-3 py-1 text-[11px] font-bold text-[#276B50]">
+                <span className="rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 px-3 py-1 text-[11px] font-bold text-[#276B50] dark:text-[#00E599]">
                   LOGGED TODAY
                 </span>
               )}
@@ -1173,11 +1174,11 @@ function HairCheckupPage({
 
             <form
               onSubmit={(e) => void handleCaptureToday(e)}
-              className="mt-5 space-y-4 border-t border-[#EAEFEA] pt-5"
+              className="mt-5 space-y-4 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-5"
             >
               {/* Focus Area */}
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                   1. Photo Focus Area
                 </label>
                 <div className="mt-1.5 grid grid-cols-3 gap-2">
@@ -1188,8 +1189,8 @@ function HairCheckupPage({
                       onClick={() => setSelectedAngle(angle)}
                       className={`rounded-xl py-2 text-xs font-bold transition ${
                         selectedAngle === angle
-                          ? "bg-[#388E6C] text-white shadow-2xs"
-                          : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                          ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                          : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                       }`}
                     >
                       {angle}
@@ -1200,7 +1201,7 @@ function HairCheckupPage({
 
               {/* Question 2: Hair fall today */}
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                   2. Roughly how many strands fell out today?
                 </label>
                 <div className="mt-1.5 grid grid-cols-2 gap-2">
@@ -1212,8 +1213,8 @@ function HairCheckupPage({
                         onClick={() => setHairFallCount(opt)}
                         className={`rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
                           hairFallCount === opt
-                            ? "border border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
-                            : "border border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                            ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
+                            : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                         }`}
                       >
                         {opt}
@@ -1225,7 +1226,7 @@ function HairCheckupPage({
 
               {/* Question 3: Thickness feel */}
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                   3. How does your hair thickness feel compared to last week?
                 </label>
                 <div className="mt-1.5 grid grid-cols-3 gap-2">
@@ -1236,8 +1237,8 @@ function HairCheckupPage({
                       onClick={() => setThicknessFeel(opt)}
                       className={`rounded-xl px-2.5 py-2 text-center text-xs font-semibold transition ${
                         thicknessFeel === opt
-                          ? "border border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
-                          : "border border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                          ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
+                          : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                       }`}
                     >
                       {opt}
@@ -1249,13 +1250,13 @@ function HairCheckupPage({
               {/* Question 4 & 5: Scalp & Baby hairs */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-bold text-[#3E4C59]">
+                  <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                     4. Scalp Condition
                   </label>
                   <select
                     value={scalpCondition}
                     onChange={(e) => setScalpCondition(e.target.value)}
-                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                   >
                     <option value="Clean & balanced">Clean &amp; balanced</option>
                     <option value="Oily / sweaty">Oily / sweaty</option>
@@ -1264,13 +1265,13 @@ function HairCheckupPage({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#3E4C59]">
+                  <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                     5. New Baby Hair Growth
                   </label>
                   <select
                     value={babyHairs}
                     onChange={(e) => setBabyHairs(e.target.value)}
-                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                   >
                     <option value="None yet">None yet</option>
                     <option value="Fine fuzz">Fine fuzz along temples</option>
@@ -1281,21 +1282,21 @@ function HairCheckupPage({
 
               {/* Optional Observation Note */}
               <div>
-                <label className="block text-xs font-bold text-[#3E4C59]">
+                <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                   Observation Note{" "}
-                  <span className="font-normal text-[#72877E]">(optional)</span>
+                  <span className="font-normal text-[#72877E] dark:text-[#7D9489]">(optional)</span>
                 </label>
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="e.g. Less hair on pillow this morning..."
-                  className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3.5 py-2.5 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                  className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#1A2B24] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                 />
               </div>
 
               {/* Snapshot Preview */}
-              <div className="relative overflow-hidden rounded-2xl border border-[#DCE5DF] bg-[#F4F7F5]">
+              <div className="relative overflow-hidden rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E]">
                 <img
                   src={
                     customImage ||
@@ -1315,7 +1316,7 @@ function HairCheckupPage({
               </div>
 
               <div className="flex flex-col gap-2.5 sm:flex-row">
-                <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] bg-white py-3 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]">
+                <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] py-3 text-xs font-bold text-[#485C53] dark:text-[#B8CCC2] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]">
                   <Upload size={15} />
                   <span>Upload Real Photo</span>
                   <input
@@ -1328,7 +1329,7 @@ function HairCheckupPage({
 
                 <button
                   type="submit"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A]"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
                 >
                   <Camera size={15} />
                   <span>Save Today&apos;s Checkup</span>
@@ -1340,30 +1341,30 @@ function HairCheckupPage({
 
         {/* Right Column: Interactive Before & After Comparison Slider + Timeline */}
         <div className="space-y-6 lg:col-span-6">
-          <section className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+          <section className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                   VISUAL COMPARISON
                 </p>
-                <h2 className="text-base font-bold text-[#1A2B24]">
+                <h2 className="text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                   Before &amp; After Split Slider
                 </h2>
               </div>
-              <span className="text-[#388E6C]">
+              <span className="text-[#388E6C] dark:text-[#00E599]">
                 <Columns2 size={18} />
               </span>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#5E736A]">
+                <label className="block text-[11px] font-bold text-[#5E736A] dark:text-[#8EA399]">
                   BEFORE (BASELINE)
                 </label>
                 <select
                   value={compareDayA}
                   onChange={(e) => setCompareDayA(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs font-semibold text-[#1A2B24] outline-none"
+                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] px-3 py-2 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] outline-none"
                 >
                   {sortedCheckups.map((c) => (
                     <option key={c.id} value={c.dayNumber}>
@@ -1373,13 +1374,13 @@ function HairCheckupPage({
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-[#5E736A]">
+                <label className="block text-[11px] font-bold text-[#5E736A] dark:text-[#8EA399]">
                   AFTER (PROGRESS)
                 </label>
                 <select
                   value={compareDayB}
                   onChange={(e) => setCompareDayB(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs font-semibold text-[#1A2B24] outline-none"
+                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] px-3 py-2 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] outline-none"
                 >
                   {sortedCheckups.map((c) => (
                     <option key={c.id} value={c.dayNumber}>
@@ -1391,7 +1392,7 @@ function HairCheckupPage({
             </div>
 
             {/* Interactive Split Overlay Viewer */}
-            <div className="relative mt-4 h-56 w-full overflow-hidden rounded-2xl border border-[#DCE5DF] bg-[#F4F7F5] select-none">
+            <div className="relative mt-4 h-56 w-full overflow-hidden rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] select-none">
               <img
                 src={selectedSnapshot?.imageUrl}
                 alt="After progress"
@@ -1410,7 +1411,7 @@ function HairCheckupPage({
 
               {/* Divider Line */}
               <div
-                className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.45)]"
+                className="pointer-events-none absolute inset-y-0 w-0.5 bg-white dark:bg-[#131A16] shadow-[0_0_8px_rgba(0,0,0,0.45)]"
                 style={{ left: `${sliderPos}%` }}
               >
                 <div className="absolute top-1/2 left-1/2 flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#1A2B24] text-[10px] font-bold text-white shadow">
@@ -1421,13 +1422,13 @@ function HairCheckupPage({
               <span className="absolute top-3 left-3 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-bold text-white">
                 Day {baselineSnapshot?.dayNumber || 1}
               </span>
-              <span className="absolute top-3 right-3 rounded-lg bg-[#388E6C] px-2.5 py-1 text-[10px] font-bold text-white">
+              <span className="absolute top-3 right-3 rounded-lg bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] px-2.5 py-1 text-[10px] font-bold text-white">
                 Day {selectedSnapshot?.dayNumber || currentJourneyDay}
               </span>
             </div>
 
             <div className="mt-3 flex items-center gap-3">
-              <span className="text-[11px] font-bold text-[#5E736A]">Slide to compare</span>
+              <span className="text-[11px] font-bold text-[#5E736A] dark:text-[#8EA399]">Slide to compare</span>
               <input
                 type="range"
                 min={5}
@@ -1435,18 +1436,18 @@ function HairCheckupPage({
                 value={sliderPos}
                 onChange={(e) => setSliderPos(Number(e.target.value))}
                 aria-label="Compare before and after hair growth"
-                className="h-1.5 flex-1 cursor-pointer accent-[#388E6C]"
+                className="h-1.5 flex-1 cursor-pointer accent-[#388E6C] dark:accent-[#00E599]"
               />
             </div>
           </section>
 
           {/* Chronological Checkup Timeline */}
-          <section className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+          <section className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs sm:p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-bold text-[#1A2B24]">
+              <h2 className="text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                 Checkup History &amp; Condition Logs
               </h2>
-              <span className="rounded-full bg-[#F4F7F5] px-3 py-1 text-xs font-bold text-[#5E736A]">
+              <span className="rounded-full bg-[#F4F7F5] dark:bg-[#0B0F0E] px-3 py-1 text-xs font-bold text-[#5E736A] dark:text-[#8EA399]">
                 {sortedCheckups.length} entries
               </span>
             </div>
@@ -1455,10 +1456,10 @@ function HairCheckupPage({
               {sortedCheckups.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col justify-between rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5"
+                  className="flex flex-col justify-between rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] p-3.5"
                 >
                   <div>
-                    <div className="relative overflow-hidden rounded-xl border border-[#E1E6EB]">
+                    <div className="relative overflow-hidden rounded-xl border border-[#E1E6EB] dark:border-[#1B2922]">
                       <img
                         src={item.imageUrl}
                         alt={`Day ${item.dayNumber}`}
@@ -1471,7 +1472,7 @@ function HairCheckupPage({
                         <button
                           type="button"
                           onClick={() => void onDeleteCheckup(item.id)}
-                          className="absolute top-2 right-2 rounded-lg bg-white/90 p-1.5 text-[#5E736A] transition hover:text-[#C94A38]"
+                          className="absolute top-2 right-2 rounded-lg bg-white dark:bg-[#131A16]/90 p-1.5 text-[#5E736A] dark:text-[#8EA399] transition hover:text-[#C94A38]"
                           aria-label="Delete checkup"
                         >
                           <Trash2 size={13} />
@@ -1486,7 +1487,7 @@ function HairCheckupPage({
                         </span>
                       )}
                       {item.thicknessFeel && (
-                        <span className="rounded-md bg-[#E3F2EC] px-2 py-0.5 text-[10px] font-bold text-[#276B50]">
+                        <span className="rounded-md bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2 py-0.5 text-[10px] font-bold text-[#276B50] dark:text-[#00E599]">
                           {item.thicknessFeel}
                         </span>
                       )}
@@ -1497,10 +1498,10 @@ function HairCheckupPage({
                       )}
                     </div>
 
-                    <p className="mt-2 text-xs leading-relaxed text-[#485C53]">{item.note}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-[#485C53] dark:text-[#B8CCC2]">{item.note}</p>
                   </div>
 
-                  <p className="mt-2.5 border-t border-[#EAEFEA] pt-2 text-[10px] font-semibold text-[#72877E]">
+                  <p className="mt-2.5 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-2 text-[10px] font-semibold text-[#72877E] dark:text-[#7D9489]">
                     Logged on {item.date}
                   </p>
                 </div>
@@ -1536,21 +1537,21 @@ function ProductsCatalogPage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       {/* Header + Search */}
-      <div className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] pb-5 md:flex-row md:items-end">
+      <div className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] dark:border-[#22332A] pb-5 md:flex-row md:items-end">
         <div>
-          <span className="rounded-md bg-[#E3F2EC] px-2.5 py-1 text-[11px] font-bold text-[#388E6C]">
+          <span className="rounded-md bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2.5 py-1 text-[11px] font-bold text-[#388E6C] dark:text-[#00E599]">
             MAN MATTERS CURATED STORE
           </span>
-          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3] sm:text-3xl">
             Doctor-Backed Men&apos;s Solutions
           </h1>
-          <p className="mt-1 text-sm text-[#5E736A]">
+          <p className="mt-1 text-sm text-[#5E736A] dark:text-[#8EA399]">
             Explore clinically evaluated gummies, tonics, and kits—click any product to view details &amp; reorder.
           </p>
         </div>
 
         <div className="relative w-full md:w-80">
-          <span className="pointer-events-none absolute top-3 left-3.5 text-[#72877E]">
+          <span className="pointer-events-none absolute top-3 left-3.5 text-[#72877E] dark:text-[#7D9489]">
             <Search size={16} />
           </span>
           <input
@@ -1558,7 +1559,7 @@ function ProductsCatalogPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search Biotin, Minoxidil, Shilajit..."
-            className="w-full rounded-xl border border-[#DCE5DF] bg-white py-2.5 pr-4 pl-10 text-xs font-semibold text-[#1A2B24] shadow-2xs outline-none transition focus:border-[#388E6C]"
+            className="w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] py-2.5 pr-4 pl-10 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] shadow-2xs outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
           />
         </div>
       </div>
@@ -1572,8 +1573,8 @@ function ProductsCatalogPage() {
             onClick={() => setSelectedCategory(cat)}
             className={`rounded-full px-4 py-2 text-xs font-bold transition ${
               selectedCategory === cat
-                ? "bg-[#388E6C] text-white shadow-sm"
-                : "border border-[#DCE5DF] bg-white text-[#5E736A] hover:bg-[#EAEFEA]"
+                ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-sm"
+                : "border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
             }`}
           >
             {cat}
@@ -1586,7 +1587,7 @@ function ProductsCatalogPage() {
         {filteredProducts.map((prod) => (
           <article
             key={prod.id}
-            className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs transition hover:-translate-y-0.5 hover:border-[#388E6C] hover:shadow-md"
+            className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs transition hover:-translate-y-0.5 hover:border-[#388E6C] dark:border-[#00E599] hover:shadow-md"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -1596,10 +1597,10 @@ function ProductsCatalogPage() {
                 >
                   {prod.badge}
                 </span>
-                <div className="flex items-center gap-1 text-xs font-bold text-[#1A2B24]">
+                <div className="flex items-center gap-1 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                   <Star size={14} className="fill-[#F5B841] text-[#F5B841]" />
                   <span>{prod.rating}</span>
-                  <span className="text-[11px] font-normal text-[#72877E]">({prod.reviews})</span>
+                  <span className="text-[11px] font-normal text-[#72877E] dark:text-[#7D9489]">({prod.reviews})</span>
                 </div>
               </div>
 
@@ -1607,18 +1608,18 @@ function ProductsCatalogPage() {
                 href={prod.url}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 block text-base font-bold text-[#1A2B24] transition hover:text-[#388E6C]"
+                className="mt-3 block text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3] transition hover:text-[#388E6C] dark:text-[#00E599]"
               >
                 {prod.name}
               </a>
-              <p className="mt-1 text-xs font-semibold text-[#388E6C]">{prod.actives}</p>
-              <p className="mt-2 text-xs leading-relaxed text-[#5E736A]">{prod.benefit}</p>
+              <p className="mt-1 text-xs font-semibold text-[#388E6C] dark:text-[#00E599]">{prod.actives}</p>
+              <p className="mt-2 text-xs leading-relaxed text-[#5E736A] dark:text-[#8EA399]">{prod.benefit}</p>
             </div>
 
-            <div className="mt-5 flex items-center justify-between border-t border-[#EAEFEA] pt-4">
+            <div className="mt-5 flex items-center justify-between border-t border-[#EAEFEA] dark:border-[#1B2922] pt-4">
               <div>
-                <span className="text-base font-extrabold text-[#1A2B24]">₹{prod.price}</span>
-                <span className="ml-2 text-xs font-medium text-[#72877E] line-through">
+                <span className="text-base font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">₹{prod.price}</span>
+                <span className="ml-2 text-xs font-medium text-[#72877E] dark:text-[#7D9489] line-through">
                   ₹{prod.mrp}
                 </span>
               </div>
@@ -1627,7 +1628,7 @@ function ProductsCatalogPage() {
                 href={prod.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E6C] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition hover:bg-[#2E775A]"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
               >
                 <span>View on Site</span>
                 <ExternalLink size={13} />
@@ -1715,7 +1716,7 @@ function UserProfilePage({
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       {/* Profile Hero & Editable Picture Card */}
-      <section className="rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs sm:p-8">
+      <section className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-6 shadow-2xs sm:p-8">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
           {/* Editable Profile Avatar (Can be left as default monogram or customized) */}
           <div className="relative shrink-0">
@@ -1726,14 +1727,14 @@ function UserProfilePage({
                 className="h-24 w-24 rounded-full border-4 border-[#E3F2EC] object-cover shadow-sm"
               />
             ) : (
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#E3F2EC] bg-[#163A2E] text-3xl font-extrabold text-white shadow-sm">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#E3F2EC] bg-[#163A2E] dark:bg-[#0F1713] text-3xl font-extrabold text-white shadow-sm">
                 {displayName.slice(0, 1).toUpperCase()}
               </div>
             )}
 
             <label
               title="Change profile picture"
-              className="absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#388E6C] text-white shadow-md transition hover:scale-105 hover:bg-[#2E775A]"
+              className="absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-md transition hover:scale-105 hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
             >
               <Camera size={14} />
               <input
@@ -1747,17 +1748,17 @@ function UserProfilePage({
 
           {/* User Details & Optional Avatar Controls */}
           <div className="flex-1 text-center sm:text-left">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E3F2EC] px-3 py-1 text-[10px] font-bold tracking-wider text-[#276B50] uppercase">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 px-3 py-1 text-[10px] font-bold tracking-wider text-[#276B50] dark:text-[#00E599] uppercase">
               <ShieldCheck size={12} />
               <span>Dosemate Member · Powered by Man Matters</span>
             </div>
-            <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24]">{displayName}</h1>
-            <p className="mt-0.5 text-xs text-[#5E736A]">
+            <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">{displayName}</h1>
+            <p className="mt-0.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
               {user?.email || "guest@dosemate.app"} · {healthProfile?.hairStage || "Daily Wellness"}
             </p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3.5 py-2 text-xs font-bold text-[#1A2B24] transition hover:bg-[#E3F2EC] hover:text-[#276B50]">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] px-3.5 py-2 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] transition hover:bg-[#E3F2EC] dark:bg-[#00E599]/15 hover:text-[#276B50] dark:text-[#00E599]">
                 <Camera size={14} />
                 <span>{avatarUrl ? "Change Photo" : "Upload Photo (Optional)"}</span>
                 <input
@@ -1772,7 +1773,7 @@ function UserProfilePage({
                 <button
                   type="button"
                   onClick={() => void onUpdateAvatar("")}
-                  className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white px-3 py-2 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                  className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white dark:bg-[#131A16] px-3 py-2 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
                 >
                   <Trash2 size={13} />
                   <span>Reset Default</span>
@@ -1782,9 +1783,9 @@ function UserProfilePage({
               <button
                 type="button"
                 onClick={onEditHealthProfile}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-3.5 py-2 text-xs font-bold text-[#3E4C59] transition hover:bg-[#F4F7F5]"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-3.5 py-2 text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
               >
-                <HeartPulse size={14} className="text-[#388E6C]" />
+                <HeartPulse size={14} className="text-[#388E6C] dark:text-[#00E599]" />
                 <span>Edit Health Goals</span>
               </button>
             </div>
@@ -1792,18 +1793,18 @@ function UserProfilePage({
         </div>
 
         {/* Quick Journey Stats Strip */}
-        <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[#EAEFEA] pt-5 text-center">
-          <div className="rounded-2xl bg-[#F9FBFA] p-3">
-            <p className="text-lg font-extrabold text-[#1A2B24]">{streak}</p>
-            <p className="text-[11px] font-bold text-[#667B72]">Day Streak</p>
+        <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-5 text-center">
+          <div className="rounded-2xl bg-[#F9FBFA] dark:bg-[#17201C] p-3">
+            <p className="text-lg font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">{streak}</p>
+            <p className="text-[11px] font-bold text-[#667B72] dark:text-[#7D9489]">Day Streak</p>
           </div>
-          <div className="rounded-2xl bg-[#F9FBFA] p-3">
-            <p className="text-lg font-extrabold text-[#388E6C]">Day {currentJourneyDay}</p>
-            <p className="text-[11px] font-bold text-[#667B72]">Journey</p>
+          <div className="rounded-2xl bg-[#F9FBFA] dark:bg-[#17201C] p-3">
+            <p className="text-lg font-extrabold text-[#388E6C] dark:text-[#00E599]">Day {currentJourneyDay}</p>
+            <p className="text-[11px] font-bold text-[#667B72] dark:text-[#7D9489]">Journey</p>
           </div>
-          <div className="rounded-2xl bg-[#F9FBFA] p-3">
-            <p className="text-lg font-extrabold text-[#1A2B24]">{totalGummiesConsumed}</p>
-            <p className="text-[11px] font-bold text-[#667B72]">Doses Logged</p>
+          <div className="rounded-2xl bg-[#F9FBFA] dark:bg-[#17201C] p-3">
+            <p className="text-lg font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">{totalGummiesConsumed}</p>
+            <p className="text-[11px] font-bold text-[#667B72] dark:text-[#7D9489]">Doses Logged</p>
           </div>
         </div>
       </section>
@@ -1811,15 +1812,15 @@ function UserProfilePage({
       {/* Two-Column Lower Section: Man Matters Socials & Rate App */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Man Matters Official Socials */}
-        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs">
+        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-6 shadow-2xs">
           <div>
-            <span className="text-[11px] font-bold tracking-wider text-[#388E6C] uppercase">
+            <span className="text-[11px] font-bold tracking-wider text-[#388E6C] dark:text-[#00E599] uppercase">
               COMMUNITY &amp; UPDATES
             </span>
-            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24]">
+            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">
               Man Matters Socials
             </h2>
-            <p className="mt-1 text-xs text-[#5E736A]">
+            <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
               Follow doctor-led hair, beard, and men&apos;s wellness tips across our official channels.
             </p>
 
@@ -1830,7 +1831,7 @@ function UserProfilePage({
                   href={social.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-between rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5 transition hover:border-[#388E6C] hover:bg-white hover:shadow-2xs"
+                  className="flex items-center justify-between rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] p-3.5 transition hover:border-[#388E6C] dark:border-[#00E599] hover:bg-white dark:bg-[#131A16] hover:shadow-2xs"
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -1840,11 +1841,11 @@ function UserProfilePage({
                       {social.icon}
                     </span>
                     <div>
-                      <p className="text-xs font-extrabold text-[#1A2B24]">{social.name}</p>
-                      <p className="text-[11px] font-medium text-[#5E736A]">{social.handle}</p>
+                      <p className="text-xs font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">{social.name}</p>
+                      <p className="text-[11px] font-medium text-[#5E736A] dark:text-[#8EA399]">{social.handle}</p>
                     </div>
                   </div>
-                  <ExternalLink size={15} className="text-[#72877E]" />
+                  <ExternalLink size={15} className="text-[#72877E] dark:text-[#7D9489]" />
                 </a>
               ))}
             </div>
@@ -1852,40 +1853,40 @@ function UserProfilePage({
         </section>
 
         {/* Rate Man Matters / Dosemate App */}
-        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs">
+        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-6 shadow-2xs">
           <div>
             <span className="text-[11px] font-bold tracking-wider text-[#B87D14] uppercase">
               YOUR FEEDBACK MATTERS
             </span>
-            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24]">
+            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">
               Rate Man Matters App
             </h2>
-            <p className="mt-1 text-xs text-[#5E736A]">
+            <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
               Enjoying your daily dose reminders &amp; progress tracker? Tap a star to rate your experience.
             </p>
 
             {ratingSubmitted ? (
-              <div className="mt-5 rounded-2xl border border-[#BFE3D3] bg-[#E3F2EC]/70 p-5 text-center">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] text-white">
+              <div className="mt-5 rounded-2xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-5 text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
                   <Check size={18} />
                 </div>
                 <p className="mt-2.5 text-sm font-extrabold text-[#163A2E]">
                   Thanks for your {rating}-Star Rating!
                 </p>
-                <p className="mt-1 text-xs text-[#276B50]">
+                <p className="mt-1 text-xs text-[#276B50] dark:text-[#00E599]">
                   Your feedback helps us make Man Matters &amp; Dosemate even better.
                 </p>
                 <button
                   type="button"
                   onClick={() => setRatingSubmitted(false)}
-                  className="mt-3 text-xs font-bold text-[#388E6C] underline"
+                  className="mt-3 text-xs font-bold text-[#388E6C] dark:text-[#00E599] underline"
                 >
                   Edit rating
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmitRating} className="mt-5 space-y-4">
-                <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#EAEFEA] bg-[#F9FBFA] py-4">
+                <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#EAEFEA] dark:border-[#1B2922] bg-[#F9FBFA] dark:bg-[#17201C] py-4">
                   {[1, 2, 3, 4, 5].map((star) => {
                     const filled = (hoveredStar || rating) >= star;
                     return (
@@ -1912,8 +1913,8 @@ function UserProfilePage({
                 </div>
 
                 <div>
-                  <label htmlFor="app-review" className="block text-xs font-bold text-[#3E4C59]">
-                    Quick note <span className="font-normal text-[#72877E]">(optional)</span>
+                  <label htmlFor="app-review" className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
+                    Quick note <span className="font-normal text-[#72877E] dark:text-[#7D9489]">(optional)</span>
                   </label>
                   <textarea
                     id="app-review"
@@ -1921,13 +1922,13 @@ function UserProfilePage({
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
                     placeholder="Tell us what you love or what we can improve..."
-                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] p-3 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C] focus:bg-white"
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] p-3 text-xs text-[#1A2B24] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A]"
+                  className="w-full rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
                 >
                   Submit Rating
                 </button>
@@ -1942,7 +1943,7 @@ function UserProfilePage({
         <button
           type="button"
           onClick={() => void onSignOut()}
-          className="inline-flex items-center gap-2 rounded-2xl border border-[#F5C6BA] bg-white px-5 py-3 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+          className="inline-flex items-center gap-2 rounded-2xl border border-[#F5C6BA] bg-white dark:bg-[#131A16] px-5 py-3 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
         >
           <LogOut size={15} />
           <span>Sign Out of Dosemate</span>
@@ -2025,9 +2026,9 @@ function SahilAIChatbot({
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open Ask Queries chatbot"
-          className="flex items-center gap-2 rounded-full bg-[#163A2E] px-4 py-3 text-xs font-bold text-white shadow-2xl transition hover:scale-105 hover:bg-[#1E4D3D] active:scale-95"
+          className="flex items-center gap-2 rounded-full bg-[#163A2E] dark:bg-[#0F1713] px-4 py-3 text-xs font-bold text-white shadow-2xl transition hover:scale-105 hover:bg-[#1E4D3D] active:scale-95"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#388E6C] text-white">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
             {isOpen ? <X size={14} /> : <Bot size={15} />}
           </span>
           <span>{isOpen ? "Close Queries" : "Ask Queries"}</span>
@@ -2036,9 +2037,9 @@ function SahilAIChatbot({
 
       {/* Responsive Desktop & Mobile Chat Popup Drawer */}
       {isOpen && (
-        <div className="fixed right-4 bottom-36 left-4 z-50 flex h-[450px] flex-col overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-2xl sm:right-7 sm:bottom-36 sm:left-auto sm:w-96">
+        <div className="fixed right-4 bottom-36 left-4 z-50 flex h-[450px] flex-col overflow-hidden rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] shadow-2xl sm:right-7 sm:bottom-36 sm:left-auto sm:w-96">
           {/* Chat Header */}
-          <div className="flex items-center justify-between bg-[#163A2E] px-4 py-3.5 text-white">
+          <div className="flex items-center justify-between bg-[#163A2E] dark:bg-[#0F1713] px-4 py-3.5 text-white">
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#244E41] text-[#86E3C3]">
                 <Bot size={18} />
@@ -2063,7 +2064,7 @@ function SahilAIChatbot({
                   ])
                 }
                 title="Reset chat"
-                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white/10 hover:text-white"
+                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white dark:bg-[#131A16]/10 hover:text-white"
               >
                 <RotateCcw size={14} />
               </button>
@@ -2071,7 +2072,7 @@ function SahilAIChatbot({
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close chat"
-                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white/10 hover:text-white"
+                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white dark:bg-[#131A16]/10 hover:text-white"
               >
                 <X size={16} />
               </button>
@@ -2079,7 +2080,7 @@ function SahilAIChatbot({
           </div>
 
           {/* Message List */}
-          <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F7F5] p-4">
+          <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F7F5] dark:bg-[#0B0F0E] p-4">
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -2088,8 +2089,8 @@ function SahilAIChatbot({
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line shadow-2xs ${
                     m.sender === "user"
-                      ? "rounded-br-sm bg-[#388E6C] text-white"
-                      : "rounded-bl-sm border border-[#DCE5DF] bg-white text-[#1A2B24]"
+                      ? "rounded-br-sm bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                      : "rounded-bl-sm border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] text-[#1A2B24] dark:text-[#F1F5F3]"
                   }`}
                 >
                   {m.text}
@@ -2099,7 +2100,7 @@ function SahilAIChatbot({
 
             {isTyping && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-sm border border-[#DCE5DF] bg-white px-3.5 py-2 text-xs text-[#5E736A]">
+                <div className="rounded-2xl rounded-bl-sm border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-3.5 py-2 text-xs text-[#5E736A] dark:text-[#8EA399]">
                   Analyzing your profile…
                 </div>
               </div>
@@ -2108,7 +2109,7 @@ function SahilAIChatbot({
           </div>
 
           {/* Quick Suggestion Chips */}
-          <div className="flex gap-1.5 overflow-x-auto border-t border-[#EAEFEA] bg-white px-3.5 py-2">
+          <div className="flex gap-1.5 overflow-x-auto border-t border-[#EAEFEA] dark:border-[#1B2922] bg-white dark:bg-[#131A16] px-3.5 py-2">
             {[
               "Review my current routine",
               "Biotin vs Minoxidil?",
@@ -2118,7 +2119,7 @@ function SahilAIChatbot({
                 key={chip}
                 type="button"
                 onClick={() => setInput(chip)}
-                className="shrink-0 rounded-full border border-[#DCE5DF] bg-[#F4F7F5] px-2.5 py-1 text-[10px] font-semibold text-[#485C53] transition hover:bg-[#E3F2EC] hover:text-[#388E6C]"
+                className="shrink-0 rounded-full border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] px-2.5 py-1 text-[10px] font-semibold text-[#485C53] dark:text-[#B8CCC2] transition hover:bg-[#E3F2EC] dark:bg-[#00E599]/15 hover:text-[#388E6C] dark:text-[#00E599]"
               >
                 {chip}
               </button>
@@ -2128,19 +2129,19 @@ function SahilAIChatbot({
           {/* Input Form */}
           <form
             onSubmit={(e) => void handleSend(e)}
-            className="flex items-center gap-2 border-t border-[#EAEFEA] bg-white p-3"
+            className="flex items-center gap-2 border-t border-[#EAEFEA] dark:border-[#1B2922] bg-white dark:bg-[#131A16] p-3"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask any query about your regimen..."
-              className="flex-1 rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs text-[#1A2B24] outline-none transition focus:border-[#388E6C]"
+              className="flex-1 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] px-3 py-2 text-xs text-[#1A2B24] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
             />
             <button
               type="submit"
               disabled={!input.trim() || isTyping}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs transition hover:bg-[#2E775A] disabled:opacity-50"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] disabled:opacity-50"
             >
               <Send size={15} />
             </button>
@@ -2155,6 +2156,27 @@ function SahilAIChatbot({
  * Main Dosemate Web Application with Local Persistence & Immediate Login Screen
  */
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("dosemate_theme") || "light";
+    }
+    return "light";
+  });
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      localStorage.setItem("dosemate_theme", theme);
+    }
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }
   const [user, setUser] = useState(null);
   const [authMode, setAuthMode] = useState("signin");
   const [email, setEmail] = useState("");
@@ -2675,7 +2697,7 @@ export default function App() {
   return (
     <WebAppShell toasts={toasts}>
       {/* Sticky Top Brand & Utility Bar */}
-      <header className="sticky top-0 z-30 border-b border-[#DCE5DF] bg-white/95 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16]/95 dark:bg-[#0F1713]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           {/* Brand Logo -> Navigates back to Routine Home */}
           <button
@@ -2687,14 +2709,14 @@ export default function App() {
             className="inline-flex cursor-pointer items-center gap-2.5 text-left transition hover:opacity-80"
             aria-label="Dosemate home — go to Routine"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs sm:h-9 sm:w-9">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs sm:h-9 sm:w-9">
               <ShieldCheck size={18} strokeWidth={2.3} />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="text-base font-extrabold tracking-tight text-[#1A2B24] sm:text-lg">
-                Dose<span className="font-normal text-[#566B62]">mate</span>
+              <span className="text-base font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3] sm:text-lg">
+                Dose<span className="font-normal text-[#566B62] dark:text-[#8EA399]">mate</span>
               </span>
-              <span className="mt-0.5 text-[9px] font-bold tracking-wider text-[#388E6C] uppercase sm:text-[10px]">
+              <span className="mt-0.5 text-[9px] font-bold tracking-wider text-[#388E6C] dark:text-[#00E599] uppercase sm:text-[10px]">
                 Powered by Man Matters
               </span>
             </span>
@@ -2707,22 +2729,39 @@ export default function App() {
                 type="button"
                 onClick={() => setEditingProfile((prev) => !prev)}
                 title="Edit Health Profile"
-                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-2.5 text-xs font-semibold text-[#1A2B24] transition hover:bg-[#F4F7F5] sm:h-9 sm:px-3"
+                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-2.5 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] sm:h-9 sm:px-3"
               >
-                <HeartPulse size={14} className="text-[#388E6C]" />
+                <HeartPulse size={14} className="text-[#388E6C] dark:text-[#00E599]" />
                 <span className="hidden sm:inline">Health Profile</span>
               </button>
             )}
 
             <button
               type="button"
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle theme"
+              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-2.5 text-xs font-semibold text-[#1A2B24] transition hover:bg-[#F4F7F5] dark:border-[#22332A] dark:bg-[#131A16] dark:text-[#F1F5F3] dark:hover:bg-[#1A2520] sm:h-9 sm:px-3"
+            >
+              {theme === "dark" ? (
+                <Sun size={14} className="text-[#00E599]" />
+              ) : (
+                <Moon size={14} className="text-[#388E6C]" />
+              )}
+              <span className="hidden sm:inline">
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => void enableNotifications()}
               aria-label="Enable notifications"
-              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-2.5 text-xs font-semibold text-[#1A2B24] transition hover:bg-[#F4F7F5] sm:h-9 sm:px-3"
+              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-2.5 text-xs font-semibold text-[#1A2B24] dark:text-[#F1F5F3] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] sm:h-9 sm:px-3"
             >
               <Bell
                 size={14}
-                className={notifications === "granted" ? "text-[#388E6C]" : ""}
+                className={notifications === "granted" ? "text-[#388E6C] dark:text-[#00E599]" : ""}
               />
               <span className="hidden sm:inline">
                 {notifications === "granted" ? "Alerts on" : "Alerts"}
@@ -2770,18 +2809,18 @@ export default function App() {
         ) : (
           <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
             {/* Personalized Welcome Header & Primary Add Products CTA */}
-            <section className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] pb-6 sm:flex-row sm:items-end">
+            <section className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] dark:border-[#22332A] pb-6 sm:flex-row sm:items-end">
               <div>
-                <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#566B62]">
+                <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#566B62] dark:text-[#8EA399]">
                   <span className="inline-flex text-[#F5B841]">
                     <Sun size={14} />
                   </span>
                   {healthProfile.goalHorizon} Goal · {healthProfile.concerns?.[0] || "Daily Wellness"}
                 </p>
-                <h1 className="mt-1.5 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+                <h1 className="mt-1.5 text-2xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3] sm:text-3xl">
                   Hey {displayName.split(" ")[0]}, keep your daily ritual going
                 </h1>
-                <p className="mt-1 text-sm text-[#5E736A]">
+                <p className="mt-1 text-sm text-[#5E736A] dark:text-[#8EA399]">
                   Track each dose, monitor bottle supply, and stay consistent with your regimen.
                 </p>
               </div>
@@ -2789,7 +2828,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => openAddDialog()}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#388E6C] px-5 py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] active:scale-[0.98]"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] px-5 py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] active:scale-[0.98]"
               >
                 <Plus size={16} />
                 <span>Add Product</span>
@@ -2798,17 +2837,17 @@ export default function App() {
 
             {/* 3-Card Summary Metrics Strip */}
             <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#E3F2EC] text-[#388E6C]">
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-4 shadow-2xs">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599]">
                   <CircleCheck size={20} />
                 </span>
                 <div>
-                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                     TODAY&apos;S PROGRESS
                   </p>
-                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {dosesToday}
-                    <span className="text-sm font-medium text-[#667B72]">
+                    <span className="text-sm font-medium text-[#667B72] dark:text-[#7D9489]">
                       {" "}
                       / {expectedDoses} done
                     </span>
@@ -2816,17 +2855,17 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-4 shadow-2xs">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FDF2D8] text-[#B87D14]">
                   <Sparkles size={20} />
                 </span>
                 <div>
-                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                     CURRENT STREAK
                   </p>
-                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {streak}
-                    <span className="text-sm font-medium text-[#667B72]">
+                    <span className="text-sm font-medium text-[#667B72] dark:text-[#7D9489]">
                       {" "}
                       {streak === 1 ? "day" : "days"}
                     </span>
@@ -2834,15 +2873,15 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-4 shadow-2xs">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FCECE8] text-[#C94F32]">
                   <PackageCheck size={20} />
                 </span>
                 <div>
-                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                     BOTTLE SUPPLY
                   </p>
-                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {lowTrackers.length
                       ? `${lowTrackers.length} running low`
                       : "All well stocked"}
@@ -2886,12 +2925,12 @@ export default function App() {
               <section className="space-y-4 lg:col-span-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                    <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                       THE DAILY DOSE
                     </p>
-                    <h2 className="text-lg font-bold text-[#1A2B24]">Active Regimen</h2>
+                    <h2 className="text-lg font-bold text-[#1A2B24] dark:text-[#F1F5F3]">Active Regimen</h2>
                   </div>
-                  <span className="rounded-full bg-[#E3F2EC] px-3 py-1 text-xs font-bold text-[#276B50]">
+                  <span className="rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 px-3 py-1 text-xs font-bold text-[#276B50] dark:text-[#00E599]">
                     {trackers.length.toString().padStart(2, "0")}{" "}
                     {trackers.length === 1 ? "PRODUCT" : "PRODUCTS"}
                   </span>
@@ -2916,8 +2955,8 @@ export default function App() {
                         key={tracker.id}
                         className={`flex flex-col justify-between rounded-3xl border p-5 transition ${
                           taken
-                            ? "border-[#BFE3D3] bg-[#F1F9F5]"
-                            : "border-[#DCE5DF] bg-white shadow-2xs hover:border-[#388E6C]/50"
+                            ? "border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#F1F9F5] dark:bg-[#15231D]"
+                            : "border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] shadow-2xs hover:border-[#388E6C] dark:border-[#00E599]/50"
                         }`}
                       >
                         <div>
@@ -2927,8 +2966,8 @@ export default function App() {
                               <div
                                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold ${
                                   taken
-                                    ? "bg-[#388E6C] text-white"
-                                    : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#485C53]"
+                                    ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                                    : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#485C53] dark:text-[#B8CCC2]"
                                 }`}
                               >
                                 {taken ? (
@@ -2938,10 +2977,10 @@ export default function App() {
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <span className="text-[10px] font-bold tracking-wider text-[#667B72]">
+                                <span className="text-[10px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                                   {tracker.reminder_enabled ? "DAILY REGIMEN" : "ROUTINE"}
                                 </span>
-                                <h3 className="text-sm font-bold text-[#1A2B24]">
+                                <h3 className="text-sm font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                                   {tracker.product_name}
                                 </h3>
                               </div>
@@ -2952,15 +2991,15 @@ export default function App() {
                               onClick={() => openAddDialog(tracker)}
                               aria-label={`Edit ${tracker.product_name}`}
                               title="Edit routine"
-                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[#72877E] transition hover:bg-[#EAEFEA] hover:text-[#1A2B24]"
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[#72877E] dark:text-[#7D9489] transition hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25] hover:text-[#1A2B24] dark:text-[#F1F5F3]"
                             >
                               <Settings2 size={16} />
                             </button>
                           </div>
 
                           {/* Dosage & Meal Schedule Badges */}
-                          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#5E736A]">
-                            <span className="inline-flex items-center gap-1 font-semibold text-[#3E4C59]">
+                          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
+                            <span className="inline-flex items-center gap-1 font-semibold text-[#3E4C59] dark:text-[#A0B4AA]">
                               <Clock3 size={13} />
                               {tracker.daily_dose}{" "}
                               {tracker.daily_dose === 1 ? "unit/day" : "units/day"}
@@ -2970,13 +3009,13 @@ export default function App() {
                               tracker.dose_schedules.map((sched, sIdx) => (
                                 <span
                                   key={sIdx}
-                                  className="rounded-lg bg-[#E3F2EC] px-2 py-0.5 text-[11px] font-semibold text-[#276B50]"
+                                  className="rounded-lg bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2 py-0.5 text-[11px] font-semibold text-[#276B50] dark:text-[#00E599]"
                                 >
                                   #{sIdx + 1} · {sched.time.slice(0, 5)} ({sched.meal})
                                 </span>
                               ))
                             ) : (
-                              <span className="rounded-lg bg-[#E3F2EC] px-2 py-0.5 text-[11px] font-semibold text-[#276B50]">
+                              <span className="rounded-lg bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2 py-0.5 text-[11px] font-semibold text-[#276B50] dark:text-[#00E599]">
                                 {tracker.reminder_time.slice(0, 5)} (
                                 {tracker.meal_timing || "After meal"})
                               </span>
@@ -2986,17 +3025,17 @@ export default function App() {
                           {/* Bottle Supply Progress Bar */}
                           <div className="mt-4">
                             <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold">
-                              <span className="text-[#667B72]">
+                              <span className="text-[#667B72] dark:text-[#7D9489]">
                                 {tracker.gummies_remaining} units left in bottle
                               </span>
-                              <span className={low ? "text-[#C94F32]" : "text-[#388E6C]"}>
+                              <span className={low ? "text-[#C94F32]" : "text-[#388E6C] dark:text-[#00E599]"}>
                                 {days} {days === 1 ? "day" : "days"} left
                               </span>
                             </div>
                             <div className="h-2 w-full overflow-hidden rounded-full bg-[#E6ECE9]">
                               <div
                                 className={`h-full rounded-full transition-all duration-300 ${
-                                  low ? "bg-[#E86F52]" : "bg-[#388E6C]"
+                                  low ? "bg-[#E86F52]" : "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810]"
                                 }`}
                                 style={{ width: `${fill}%` }}
                               />
@@ -3005,15 +3044,15 @@ export default function App() {
                         </div>
 
                         {/* Action Footer */}
-                        <div className="mt-4 flex items-center gap-2 border-t border-[#EAEFEA] pt-3.5">
+                        <div className="mt-4 flex items-center gap-2 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-3.5">
                           <button
                             type="button"
                             onClick={() => void logDose(tracker)}
                             disabled={workingId === tracker.id}
                             className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition active:scale-[0.98] ${
                               taken
-                                ? "border border-[#B6DEC9] bg-[#DCF2E7] text-[#22664B] hover:bg-[#CFEAD9]"
-                                : "bg-[#388E6C] text-white shadow-2xs hover:bg-[#2E775A]"
+                                ? "border border-[#B6DEC9] dark:border-[#00E599]/30 bg-[#DCF2E7] dark:bg-[#00E599]/20 text-[#22664B] dark:text-[#00E599] hover:bg-[#CFEAD9]"
+                                : "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
                             }`}
                           >
                             <Check size={15} />
@@ -3029,7 +3068,7 @@ export default function App() {
                               href={tracker.reorder_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white px-3.5 py-2.5 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                              className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white dark:bg-[#131A16] px-3.5 py-2.5 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
                             >
                               Reorder <ArrowUpRight size={14} />
                             </a>
@@ -3044,15 +3083,15 @@ export default function App() {
               {/* Right 4 Columns: Weekly Consistency & Health Summary Sidebar */}
               <aside className="space-y-4 lg:col-span-4">
                 {/* 7-Day Consistency Calendar */}
-                <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs">
+                <div className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs">
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                      <p className="text-[11px] font-bold tracking-wider text-[#667B72] dark:text-[#7D9489]">
                         CONSISTENCY
                       </p>
-                      <h2 className="text-base font-bold text-[#1A2B24]">Last 7 Days</h2>
+                      <h2 className="text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3]">Last 7 Days</h2>
                     </div>
-                    <span className="rounded-full bg-[#E3F2EC] px-2.5 py-1 text-xs font-bold text-[#276B50]">
+                    <span className="rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2.5 py-1 text-xs font-bold text-[#276B50] dark:text-[#00E599]">
                       {
                         logs.filter((log) =>
                           trackers.some((tracker) => tracker.id === log.tracker_id)
@@ -3082,22 +3121,22 @@ export default function App() {
 
                       return (
                         <div key={key} className="flex flex-col items-center gap-1.5">
-                          <span className="text-[10px] font-bold text-[#72877E]">
+                          <span className="text-[10px] font-bold text-[#72877E] dark:text-[#7D9489]">
                             {new Intl.DateTimeFormat("en", { weekday: "narrow" }).format(date)}
                           </span>
                           <span
                             className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition ${
                               complete
-                                ? "bg-[#388E6C] text-white shadow-2xs"
+                                ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
                                 : partial
-                                ? "border border-[#388E6C] bg-[#E3F2EC] text-[#276B50]"
-                                : "border border-[#E1E6EB] bg-[#F9FBFA] text-[#566B62]"
+                                ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#276B50] dark:text-[#00E599]"
+                                : "border border-[#E1E6EB] dark:border-[#1B2922] bg-[#F9FBFA] dark:bg-[#17201C] text-[#566B62] dark:text-[#8EA399]"
                             }`}
                           >
                             {complete ? (
                               <Check size={14} />
                             ) : partial ? (
-                              <span className="h-2 w-2 rounded-full bg-[#388E6C]" />
+                              <span className="h-2 w-2 rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810]" />
                             ) : (
                               <span>{date.getDate()}</span>
                             )}
@@ -3109,23 +3148,23 @@ export default function App() {
                 </div>
 
                 {/* User Health Profile Snapshot Card */}
-                <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs">
+                <div className="rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-5 shadow-2xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold tracking-wider text-[#388E6C]">
+                    <span className="text-[11px] font-bold tracking-wider text-[#388E6C] dark:text-[#00E599]">
                       YOUR HEALTH PROFILE
                     </span>
                     <button
                       type="button"
                       onClick={() => setEditingProfile(true)}
-                      className="text-xs font-bold text-[#5E736A] underline hover:text-[#1A2B24]"
+                      className="text-xs font-bold text-[#5E736A] dark:text-[#8EA399] underline hover:text-[#1A2B24] dark:text-[#F1F5F3]"
                     >
                       Edit
                     </button>
                   </div>
-                  <p className="mt-1.5 text-sm font-bold text-[#1A2B24]">
+                  <p className="mt-1.5 text-sm font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {healthProfile.hairStage}
                   </p>
-                  <p className="mt-1 text-xs text-[#5E736A]">
+                  <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
                     Age {healthProfile.age} · Sleep {healthProfile.sleepHours} ·{" "}
                     {healthProfile.stressLevel} stress
                   </p>
@@ -3133,7 +3172,7 @@ export default function App() {
                     {(healthProfile.concerns || []).map((c) => (
                       <span
                         key={c}
-                        className="rounded-lg bg-[#F4F7F5] px-2.5 py-1 text-[10px] font-bold text-[#3E4C59]"
+                        className="rounded-lg bg-[#F4F7F5] dark:bg-[#0B0F0E] px-2.5 py-1 text-[10px] font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                       >
                         {c}
                       </span>
@@ -3158,7 +3197,7 @@ export default function App() {
       {healthProfile && !editingProfile && (
         <nav
           aria-label="Bottom page navigation"
-          className="fixed inset-x-0 bottom-0 z-30 border-t border-[#DCE5DF] bg-white/95 px-4 py-2.5 shadow-[0_-4px_20px_rgba(22,58,46,0.06)] backdrop-blur-md"
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16]/95 dark:bg-[#0F1713]/90 px-4 py-2.5 shadow-[0_-4px_20px_rgba(22,58,46,0.06)] backdrop-blur-md"
         >
           <div className="mx-auto grid max-w-lg grid-cols-4 gap-1.5 sm:gap-2">
             <button
@@ -3166,8 +3205,8 @@ export default function App() {
               onClick={() => setActiveTab("routine")}
               className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
                 activeTab === "routine"
-                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
-                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+                  ? "bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] hover:text-[#1A2B24] dark:text-[#F1F5F3]"
               }`}
             >
               <Pill size={17} />
@@ -3179,8 +3218,8 @@ export default function App() {
               onClick={() => setActiveTab("progress")}
               className={`relative flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
                 activeTab === "progress"
-                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
-                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+                  ? "bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] hover:text-[#1A2B24] dark:text-[#F1F5F3]"
               }`}
             >
               <Camera size={17} />
@@ -3195,8 +3234,8 @@ export default function App() {
               onClick={() => setActiveTab("products")}
               className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
                 activeTab === "products"
-                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
-                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+                  ? "bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] hover:text-[#1A2B24] dark:text-[#F1F5F3]"
               }`}
             >
               <ShoppingBag size={17} />
@@ -3208,8 +3247,8 @@ export default function App() {
               onClick={() => setActiveTab("profile")}
               className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
                 activeTab === "profile"
-                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
-                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+                  ? "bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-2xs"
+                  : "text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E] hover:text-[#1A2B24] dark:text-[#F1F5F3]"
               }`}
             >
               {avatarUrl ? (
@@ -3234,17 +3273,17 @@ export default function App() {
           role="dialog"
           aria-modal="true"
         >
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] p-6 shadow-2xl">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E3F2EC] text-[#388E6C]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599]">
                   <ShieldCheck size={20} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#1A2B24]">
+                  <h2 className="text-base font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                     {editing ? "Edit product routine" : "Add product to routine"}
                   </h2>
-                  <p className="text-xs text-[#5E736A]">
+                  <p className="text-xs text-[#5E736A] dark:text-[#8EA399]">
                     Select a supplement or add your own with custom meal timings.
                   </p>
                 </div>
@@ -3254,7 +3293,7 @@ export default function App() {
                 type="button"
                 onClick={() => setDialogOpen(false)}
                 aria-label="Close modal"
-                className="rounded-full p-1.5 text-[#72877E] hover:bg-[#F4F7F5]"
+                className="rounded-full p-1.5 text-[#72877E] dark:text-[#7D9489] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
               >
                 <X size={18} />
               </button>
@@ -3264,7 +3303,7 @@ export default function App() {
               <div>
                 <label
                   htmlFor="product-select"
-                  className="block text-xs font-bold text-[#3E4C59]"
+                  className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                 >
                   Select Product
                 </label>
@@ -3272,7 +3311,7 @@ export default function App() {
                   id="product-select"
                   value={form.is_custom_product ? "__custom__" : form.product_name}
                   onChange={(event) => handleSelectProductPreset(event.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                  className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                 >
                   {MAN_MATTERS_GUMMY_PRESETS.map((preset) => (
                     <option key={preset.name} value={preset.name}>
@@ -3286,7 +3325,7 @@ export default function App() {
                   <div className="mt-2.5">
                     <label
                       htmlFor="custom-product-name"
-                      className="block text-[11px] font-bold text-[#5E736A]"
+                      className="block text-[11px] font-bold text-[#5E736A] dark:text-[#8EA399]"
                     >
                       Custom product name
                     </label>
@@ -3300,7 +3339,7 @@ export default function App() {
                         setForm({ ...form, product_name: event.target.value })
                       }
                       placeholder="e.g. Redensyl Hair Tonic or Multivitamin"
-                      className="mt-1 w-full rounded-xl border border-[#388E6C] bg-white px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition"
+                      className="mt-1 w-full rounded-xl border border-[#388E6C] dark:border-[#00E599] bg-white dark:bg-[#131A16] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition"
                     />
                   </div>
                 )}
@@ -3310,7 +3349,7 @@ export default function App() {
                 <div>
                   <label
                     htmlFor="stock-count"
-                    className="block text-xs font-bold text-[#3E4C59]"
+                    className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                   >
                     Units in bottle
                   </label>
@@ -3324,14 +3363,14 @@ export default function App() {
                     onChange={(event) =>
                       setForm({ ...form, gummies_remaining: Number(event.target.value) })
                     }
-                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="daily-dose"
-                    className="block text-xs font-bold text-[#3E4C59]"
+                    className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                   >
                     Units per day
                   </label>
@@ -3343,8 +3382,8 @@ export default function App() {
                         onClick={() => handleDailyDoseChange(num)}
                         className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
                           form.daily_dose === num
-                            ? "bg-[#388E6C] text-white shadow-2xs"
-                            : "border border-[#D5DCE4] bg-[#F7F8FA] text-[#485C53] hover:bg-[#EAEFEA]"
+                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                            : "border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                         }`}
                       >
                         {num}
@@ -3359,7 +3398,7 @@ export default function App() {
                       aria-label="Custom daily dose"
                       value={form.daily_dose}
                       onChange={(event) => handleDailyDoseChange(event.target.value)}
-                      className="w-12 rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-1.5 py-2.5 text-center text-xs font-bold text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                      className="w-12 rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-1.5 py-2.5 text-center text-xs font-bold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                     />
                   </div>
                 </div>
@@ -3371,7 +3410,7 @@ export default function App() {
                   <div>
                     <label
                       htmlFor="reminder-time"
-                      className="block text-xs font-bold text-[#3E4C59]"
+                      className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                     >
                       Reminder time
                     </label>
@@ -3383,12 +3422,12 @@ export default function App() {
                       onChange={(event) =>
                         updateDoseScheduleItem(0, "time", event.target.value)
                       }
-                      className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                      className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                     />
                   </div>
 
                   <div>
-                    <span className="block text-xs font-bold text-[#3E4C59]">Meal timing</span>
+                    <span className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">Meal timing</span>
                     <div className="mt-1.5 grid grid-cols-2 gap-1.5">
                       {["Before meal", "After meal"].map((option) => (
                         <button
@@ -3397,8 +3436,8 @@ export default function App() {
                           onClick={() => updateDoseScheduleItem(0, "meal", option)}
                           className={`rounded-xl py-2.5 text-[11px] font-bold transition ${
                             (form.dose_schedules[0]?.meal || form.meal_timing) === option
-                              ? "bg-[#388E6C] text-white shadow-2xs"
-                              : "border border-[#D5DCE4] bg-[#F7F8FA] text-[#485C53] hover:bg-[#EAEFEA]"
+                              ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                              : "border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                           }`}
                         >
                           {option === "Before meal" ? "Before" : "After"}
@@ -3408,12 +3447,12 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2.5 rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5">
+                <div className="space-y-2.5 rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] p-3.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold tracking-wide text-[#276B50]">
+                    <span className="text-[11px] font-bold tracking-wide text-[#276B50] dark:text-[#00E599]">
                       SEPARATE DOSE SCHEDULE ({form.daily_dose} UNITS)
                     </span>
-                    <span className="text-[10px] font-semibold text-[#667B72]">
+                    <span className="text-[10px] font-semibold text-[#667B72] dark:text-[#7D9489]">
                       Time &amp; meal preference
                     </span>
                   </div>
@@ -3422,9 +3461,9 @@ export default function App() {
                     {form.dose_schedules.map((sched, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-2 rounded-xl border border-[#E1E6EB] bg-white p-2"
+                        className="flex items-center gap-2 rounded-xl border border-[#E1E6EB] dark:border-[#1B2922] bg-white dark:bg-[#131A16] p-2"
                       >
-                        <span className="w-16 shrink-0 text-[11px] font-bold text-[#3E4C59]">
+                        <span className="w-16 shrink-0 text-[11px] font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
                           Dose #{idx + 1}
                         </span>
                         <input
@@ -3435,7 +3474,7 @@ export default function App() {
                           onChange={(event) =>
                             updateDoseScheduleItem(idx, "time", event.target.value)
                           }
-                          className="w-24 rounded-lg border border-[#D5DCE4] bg-[#F7F8FA] px-2 py-1.5 text-[11px] font-semibold text-[#141A21] outline-none focus:border-[#388E6C]"
+                          className="w-24 rounded-lg border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-2 py-1.5 text-[11px] font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                         />
                         <div className="flex flex-1 gap-1">
                           {["Before meal", "After meal"].map((option) => (
@@ -3445,8 +3484,8 @@ export default function App() {
                               onClick={() => updateDoseScheduleItem(idx, "meal", option)}
                               className={`flex-1 rounded-lg py-1.5 text-[10px] font-bold transition ${
                                 sched.meal === option
-                                  ? "bg-[#388E6C] text-white"
-                                  : "bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                                  ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                                  : "bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                               }`}
                             >
                               {option === "Before meal" ? "Before" : "After"}
@@ -3463,7 +3502,7 @@ export default function App() {
                 <div>
                   <label
                     htmlFor="reorder-threshold"
-                    className="block text-xs font-bold text-[#3E4C59]"
+                    className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                   >
                     Low-stock warning (days left)
                   </label>
@@ -3477,14 +3516,14 @@ export default function App() {
                     onChange={(event) =>
                       setForm({ ...form, reorder_threshold: Number(event.target.value) })
                     }
-                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="reorder-url"
-                    className="block text-xs font-bold text-[#3E4C59]"
+                    className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]"
                   >
                     Reorder link
                   </label>
@@ -3497,20 +3536,20 @@ export default function App() {
                       setForm({ ...form, reorder_url: event.target.value })
                     }
                     placeholder="https://man.matters"
-                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599]"
                   />
                 </div>
               </div>
 
-              <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5">
+              <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] p-3.5">
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#FDF2D8] text-[#B87D14]">
                   <Bell size={15} />
                 </span>
                 <span className="flex-1">
-                  <strong className="block text-xs font-bold text-[#1A2B24]">
+                  <strong className="block text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3]">
                     Enable daily reminders
                   </strong>
-                  <small className="text-[11px] text-[#5E736A]">
+                  <small className="text-[11px] text-[#5E736A] dark:text-[#8EA399]">
                     {form.dose_schedules.length > 1
                       ? `${form.dose_schedules.length} reminders (${form.dose_schedules
                           .map((s) => `${s.time} ${s.meal === "Before meal" ? "before" : "after"}`)
@@ -3527,11 +3566,11 @@ export default function App() {
                     setForm({ ...form, reminder_enabled: event.target.checked })
                   }
                   aria-label="Enable daily reminder"
-                  className="h-4 w-4 accent-[#388E6C]"
+                  className="h-4 w-4 accent-[#388E6C] dark:accent-[#00E599]"
                 />
               </label>
 
-              <div className="flex items-center justify-end gap-2.5 border-t border-[#EAEFEA] pt-4">
+              <div className="flex items-center justify-end gap-2.5 border-t border-[#EAEFEA] dark:border-[#1B2922] pt-4">
                 {editing && (
                   <button
                     type="button"
@@ -3544,14 +3583,14 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setDialogOpen(false)}
-                  className="rounded-xl border border-[#DCE5DF] bg-white px-4 py-2.5 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]"
+                  className="rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] px-4 py-2.5 text-xs font-bold text-[#485C53] dark:text-[#B8CCC2] transition hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-xl bg-[#388E6C] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] disabled:opacity-60"
+                  className="rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] disabled:opacity-60"
                 >
                   {saving ? "Saving…" : editing ? "Save changes" : "Add product"}
                 </button>
