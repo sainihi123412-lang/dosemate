@@ -507,9 +507,9 @@ function SignInScreen({
           </form>
 
           <div className="my-5 flex items-center gap-3 text-[11px] font-bold text-[#72877E] dark:text-[#7D9489]">
-            <span className="h-px flex-1 bg-[#EAEFEA]" />
+            <span className="h-px flex-1 bg-[#EAEFEA] dark:bg-[#22332A]" />
             <span>OR CONTINUE WITH</span>
-            <span className="h-px flex-1 bg-[#EAEFEA]" />
+            <span className="h-px flex-1 bg-[#EAEFEA] dark:bg-[#22332A]" />
           </div>
 
           <div className="space-y-2.5">
@@ -527,7 +527,7 @@ function SignInScreen({
               type="button"
               disabled={authBusy}
               onClick={() => void signInAsGuest()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 py-3 text-xs font-bold text-[#163A2E] transition hover:bg-[#E3F2EC] dark:bg-[#00E599]/15"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#BFE3D3] dark:border-[#00E599]/40 bg-[#E3F2EC] dark:bg-[#00E599]/15 py-3 text-xs font-bold text-[#163A2E] dark:text-[#00E599] transition hover:bg-[#E3F2EC] dark:hover:bg-[#00E599]/25"
             >
               <Sparkles size={15} className="text-[#388E6C] dark:text-[#00E599]" />
               <span>Continue as Instant Guest</span>
@@ -773,7 +773,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleConcern(item)}
                       className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-xs font-bold transition ${
                         active
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white shadow-2xs"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white dark:text-white shadow-2xs"
                           : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520]"
                       }`}
                     >
@@ -813,7 +813,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => setHairStage(stage)}
                       className={`flex items-center justify-between rounded-2xl border px-3.5 py-3 text-left text-xs font-bold transition ${
                         hairStage === stage
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white dark:text-white"
                           : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520]"
                       }`}
                     >
@@ -889,7 +889,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleProduct(preset.name)}
                       className={`flex items-center justify-between gap-2 rounded-2xl border p-3 text-left text-xs font-bold transition ${
                         checked
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
                           : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-white dark:bg-[#131A16]"
                       }`}
                     >
@@ -914,7 +914,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       key={customName}
                       type="button"
                       onClick={() => toggleProduct(customName)}
-                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-3 text-left text-xs font-bold text-[#163A2E] dark:text-white"
+                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 dark:bg-[#00E599]/15 p-3 text-left text-xs font-bold text-[#163A2E] dark:text-white"
                     >
                       <span className="line-clamp-1">{customName}</span>
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]">
@@ -1213,7 +1213,7 @@ function HairCheckupPage({
                         onClick={() => setHairFallCount(opt)}
                         className={`rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
                           hairFallCount === opt
-                            ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
+                            ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white dark:text-white"
                             : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                         }`}
                       >
@@ -1237,7 +1237,7 @@ function HairCheckupPage({
                       onClick={() => setThicknessFeel(opt)}
                       className={`rounded-xl px-2.5 py-2 text-center text-xs font-semibold transition ${
                         thicknessFeel === opt
-                          ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
+                          ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white dark:text-white"
                           : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                       }`}
                     >
@@ -1866,11 +1866,11 @@ function UserProfilePage({
             </p>
 
             {ratingSubmitted ? (
-              <div className="mt-5 rounded-2xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-5 text-center">
+              <div className="mt-5 rounded-2xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15 dark:bg-[#00E599]/15 p-5 text-center">
                 <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]">
                   <Check size={18} />
                 </div>
-                <p className="mt-2.5 text-sm font-extrabold text-[#163A2E]">
+                <p className="mt-2.5 text-sm font-extrabold text-[#163A2E] dark:text-[#00E599]">
                   Thanks for your {rating}-Star Rating!
                 </p>
                 <p className="mt-1 text-xs text-[#276B50] dark:text-[#00E599]">
