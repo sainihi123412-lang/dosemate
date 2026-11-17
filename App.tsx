@@ -394,7 +394,7 @@ function SignInScreen({
         <div className="flex flex-col justify-between bg-[#163A2E] dark:bg-[#0F1713] p-8 text-white sm:p-10 lg:col-span-6">
           <div>
             <div className="inline-flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs">
                 <ShieldCheck size={20} />
               </span>
               <div className="flex flex-col leading-tight">
@@ -773,14 +773,14 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleConcern(item)}
                       className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-xs font-bold transition ${
                         active
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] shadow-2xs"
-                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white shadow-2xs"
+                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520]"
                       }`}
                     >
                       <span>{item}</span>
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                          active ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold" : "border border-[#CFD8D3] dark:border-[#2A3F34] bg-white dark:bg-[#131A16]"
+                          active ? "bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]" : "border border-[#CFD8D3] dark:border-[#2A3F34] bg-white dark:bg-[#131A16]"
                         }`}
                       >
                         {active && <Check size={12} />}
@@ -813,8 +813,8 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => setHairStage(stage)}
                       className={`flex items-center justify-between rounded-2xl border px-3.5 py-3 text-left text-xs font-bold transition ${
                         hairStage === stage
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
-                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
+                          : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520]"
                       }`}
                     >
                       <span>{stage}</span>
@@ -835,7 +835,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                         onClick={() => setSleepHours(opt)}
                         className={`rounded-xl py-2.5 text-xs font-bold transition ${
                           sleepHours === opt
-                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                             : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399]"
                         }`}
                       >
@@ -855,7 +855,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                         onClick={() => setStressLevel(opt)}
                         className={`rounded-xl py-2.5 text-xs font-bold transition ${
                           stressLevel === opt
-                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                             : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399]"
                         }`}
                       >
@@ -889,7 +889,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => toggleProduct(preset.name)}
                       className={`flex items-center justify-between gap-2 rounded-2xl border p-3 text-left text-xs font-bold transition ${
                         checked
-                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 text-[#163A2E]"
+                          ? "border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
                           : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-white dark:bg-[#131A16]"
                       }`}
                     >
@@ -897,7 +897,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
                           checked
-                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                            ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                             : "border border-[#D5DCE4] dark:border-[#25382E] bg-white dark:bg-[#131A16]"
                         }`}
                       >
@@ -914,10 +914,10 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       key={customName}
                       type="button"
                       onClick={() => toggleProduct(customName)}
-                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-3 text-left text-xs font-bold text-[#163A2E]"
+                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-3 text-left text-xs font-bold text-[#163A2E] dark:text-white"
                     >
                       <span className="line-clamp-1">{customName}</span>
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]">
                         <Check size={12} />
                       </span>
                     </button>
@@ -970,7 +970,7 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
                       onClick={() => setGoalHorizon(goal)}
                       className={`rounded-2xl py-3 text-xs font-bold transition ${
                         goalHorizon === goal
-                          ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                          ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs"
                           : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                       }`}
                     >
@@ -1149,7 +1149,7 @@ function HairCheckupPage({
               <div className="flex items-center gap-3">
                 <span
                   className={`flex h-10 w-10 items-center justify-center rounded-2xl font-bold ${
-                    todayLogged ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold" : "bg-[#FDF2D8] text-[#B87D14]"
+                    todayLogged ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]" : "bg-[#FDF2D8] text-[#B87D14]"
                   }`}
                 >
                   {todayLogged ? <Check size={18} /> : <Camera size={18} />}
@@ -1189,7 +1189,7 @@ function HairCheckupPage({
                       onClick={() => setSelectedAngle(angle)}
                       className={`rounded-xl py-2 text-xs font-bold transition ${
                         selectedAngle === angle
-                          ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                          ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs"
                           : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                       }`}
                     >
@@ -1213,7 +1213,7 @@ function HairCheckupPage({
                         onClick={() => setHairFallCount(opt)}
                         className={`rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
                           hairFallCount === opt
-                            ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
+                            ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
                             : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                         }`}
                       >
@@ -1237,7 +1237,7 @@ function HairCheckupPage({
                       onClick={() => setThicknessFeel(opt)}
                       className={`rounded-xl px-2.5 py-2 text-center text-xs font-semibold transition ${
                         thicknessFeel === opt
-                          ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E]"
+                          ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#163A2E] dark:text-white"
                           : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#F4F7F5] dark:hover:bg-[#1A2520] dark:bg-[#0B0F0E]"
                       }`}
                     >
@@ -1573,7 +1573,7 @@ function ProductsCatalogPage() {
             onClick={() => setSelectedCategory(cat)}
             className={`rounded-full px-4 py-2 text-xs font-bold transition ${
               selectedCategory === cat
-                ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-sm"
+                ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-sm"
                 : "border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
             }`}
           >
@@ -1734,7 +1734,7 @@ function UserProfilePage({
 
             <label
               title="Change profile picture"
-              className="absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-md transition hover:scale-105 hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
+              className="absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-md transition hover:scale-105 hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
             >
               <Camera size={14} />
               <input
@@ -1867,7 +1867,7 @@ function UserProfilePage({
 
             {ratingSubmitted ? (
               <div className="mt-5 rounded-2xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15/70 dark:bg-[#00E599]/15 p-5 text-center">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]">
                   <Check size={18} />
                 </div>
                 <p className="mt-2.5 text-sm font-extrabold text-[#163A2E]">
@@ -2028,7 +2028,7 @@ function SahilAIChatbot({
           aria-label="Open Ask Queries chatbot"
           className="flex items-center gap-2 rounded-full bg-[#163A2E] dark:bg-[#0F1713] px-4 py-3 text-xs font-bold text-white shadow-2xl transition hover:scale-105 hover:bg-[#1E4D3D] active:scale-95"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]">
             {isOpen ? <X size={14} /> : <Bot size={15} />}
           </span>
           <span>{isOpen ? "Close Queries" : "Ask Queries"}</span>
@@ -2089,7 +2089,7 @@ function SahilAIChatbot({
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line shadow-2xs ${
                     m.sender === "user"
-                      ? "rounded-br-sm bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                      ? "rounded-br-sm bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                       : "rounded-bl-sm border border-[#DCE5DF] dark:border-[#22332A] bg-white dark:bg-[#131A16] text-[#1A2B24] dark:text-[#F1F5F3]"
                   }`}
                 >
@@ -2141,7 +2141,7 @@ function SahilAIChatbot({
             <button
               type="submit"
               disabled={!input.trim() || isTyping}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] disabled:opacity-50"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88] disabled:opacity-50"
             >
               <Send size={15} />
             </button>
@@ -2337,8 +2337,17 @@ export default function App() {
 
   async function signInAsGuest() {
     setAuthBusy(true);
-    startUserSession("guest@dosemate.app");
-    showToast("Signed in as Guest. Personalize your routine below!");
+    const guestId = `guest_${Date.now()}`;
+    setUser({
+      uid: guestId,
+      email: "guest@dosemate.app",
+    });
+    setHealthProfile(null);
+    setTrackers([]);
+    setLogs([]);
+    setCheckups(createSeedCheckups());
+    setEditingProfile(false);
+    showToast("Welcome! Let's personalize your health routine.");
     setAuthBusy(false);
   }
 
@@ -2709,7 +2718,7 @@ export default function App() {
             className="inline-flex cursor-pointer items-center gap-2.5 text-left transition hover:opacity-80"
             aria-label="Dosemate home — go to Routine"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs sm:h-9 sm:w-9">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs sm:h-9 sm:w-9">
               <ShieldCheck size={18} strokeWidth={2.3} />
             </span>
             <span className="flex flex-col leading-none">
@@ -2966,7 +2975,7 @@ export default function App() {
                               <div
                                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold ${
                                   taken
-                                    ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                                    ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                                     : "border border-[#DCE5DF] dark:border-[#22332A] bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#485C53] dark:text-[#B8CCC2]"
                                 }`}
                               >
@@ -3052,7 +3061,7 @@ export default function App() {
                             className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition active:scale-[0.98] ${
                               taken
                                 ? "border border-[#B6DEC9] dark:border-[#00E599]/30 bg-[#DCF2E7] dark:bg-[#00E599]/20 text-[#22664B] dark:text-[#00E599] hover:bg-[#CFEAD9]"
-                                : "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
+                                : "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
                             }`}
                           >
                             <Check size={15} />
@@ -3127,7 +3136,7 @@ export default function App() {
                           <span
                             className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition ${
                               complete
-                                ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                                ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs"
                                 : partial
                                 ? "border border-[#388E6C] dark:border-[#00E599] bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#276B50] dark:text-[#00E599]"
                                 : "border border-[#E1E6EB] dark:border-[#1B2922] bg-[#F9FBFA] dark:bg-[#17201C] text-[#566B62] dark:text-[#8EA399]"
@@ -3382,7 +3391,7 @@ export default function App() {
                         onClick={() => handleDailyDoseChange(num)}
                         className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
                           form.daily_dose === num
-                            ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                            ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs"
                             : "border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                         }`}
                       >
@@ -3436,7 +3445,7 @@ export default function App() {
                           onClick={() => updateDoseScheduleItem(0, "meal", option)}
                           className={`rounded-xl py-2.5 text-[11px] font-bold transition ${
                             (form.dose_schedules[0]?.meal || form.meal_timing) === option
-                              ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold shadow-2xs"
+                              ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-2xs"
                               : "border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] text-[#485C53] dark:text-[#B8CCC2] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                           }`}
                         >
@@ -3484,7 +3493,7 @@ export default function App() {
                               onClick={() => updateDoseScheduleItem(idx, "meal", option)}
                               className={`flex-1 rounded-lg py-1.5 text-[10px] font-bold transition ${
                                 sched.meal === option
-                                  ? "bg-[#388E6C] dark:bg-[#00E599] dark:text-[#061810] text-white dark:bg-[#00E599] dark:text-[#061810] dark:font-extrabold"
+                                  ? "bg-[#388E6C] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
                                   : "bg-[#F4F7F5] dark:bg-[#0B0F0E] text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25]"
                               }`}
                             >
