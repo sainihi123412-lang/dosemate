@@ -1,0 +1,3606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dosemate — Wellness Tracker Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- 1. React & ReactDOM first -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- 2. Babel standalone for JSX/TS transpilation -->
+  <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+  <!-- 3. App code transpiled at runtime -->
+  <script type="text/babel" data-presets="react,typescript">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* ── Lucide-react icon shims (SVG stubs) ───────────────────── */
+function LucideIcon({ paths, size = 24, className = "", strokeWidth = 2, fill = "none", ...rest }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size}
+      viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+      strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+      className={className} {...rest}>
+      {paths.map((d, i) => <path key={i} d={d}/>)}
+    </svg>
+  );
+}
+const mkIcon = (paths, fill) => ({ size, className, strokeWidth, ...rest }) =>
+  <LucideIcon paths={paths} size={size} className={className} strokeWidth={strokeWidth} fill={fill} {...rest}/>;
+
+const ArrowDown    = mkIcon(["M12 5v14","M19 12l-7 7-7-7"]);
+const ArrowLeft    = mkIcon(["M19 12H5","M12 19l-7-7 7-7"]);
+const ArrowRight   = mkIcon(["M5 12h14","M12 5l7 7-7 7"]);
+const ArrowUpRight = mkIcon(["M7 17L17 7","M7 7h10v10"]);
+const Bell         = mkIcon(["M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9","M13.73 21a2 2 0 0 1-3.46 0"]);
+const Bot          = mkIcon(["M12 8V4H8","M3 10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8z","M9 16v-2","M15 16v-2"]);
+const Camera       = mkIcon(["M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z","M12 13m-4 0a4 4 0 1 0 8 0 4 4 0 1 0-8 0"]);
+const Check        = mkIcon(["M20 6L9 17l-5-5"]);
+const CircleCheck  = mkIcon(["M22 11.08V12a10 10 0 1 1-5.93-9.14","M22 4L12 14.01l-3-3"]);
+const Clock3       = mkIcon(["M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z","M12 6v6l4 2"]);
+const Columns2     = mkIcon(["M3 3h8v18H3z","M13 3h8v18h-8z"]);
+const ExternalLink = mkIcon(["M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6","M15 3h6v6","M10 14L21 3"]);
+const Globe        = mkIcon(["M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z","M2 12h20","M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"]);
+const HeartPulse   = mkIcon(["M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z","M3.22 12H9.5l1.5-3 2 7 1.5-4 1 2h4.78"]);
+const Instagram    = mkIcon(["M9 2H15A7 7 0 0 1 22 9V15A7 7 0 0 1 15 22H9A7 7 0 0 1 2 15V9A7 7 0 0 1 9 2Z","M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z","M17.5 6.5h.01"]);
+const LogOut       = mkIcon(["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4","M16 17l5-5-5-5","M21 12H9"]);
+const PackageCheck = mkIcon(["M16.5 9.4l-9-5.19","M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z","M3.29 7L12 12.01 20.71 7","M12 22.08V12","M9 11.5l2 2 4-4"]);
+const Pill         = mkIcon(["M10.5 20.5 20.5 10.5c1.93-1.93 1.93-5.07 0-7s-5.07-1.93-7 0l-10 10c-1.93 1.93-1.93 5.07 0 7s5.07 1.93 7 0Z","M6.5 11.5l6 6"]);
+const Plus         = mkIcon(["M12 5v14","M5 12h14"]);
+const RotateCcw    = mkIcon(["M3 2v6h6","M3.51 15a9 9 0 1 0 .49-5"]);
+const Search       = mkIcon(["M21 21l-4.35-4.35","M11 19A8 8 0 1 0 11 3a8 8 0 0 0 0 16z"]);
+const Send         = mkIcon(["M22 2L11 13","M22 2L15 22l-4-9-9-4 20-7z"]);
+const Settings2    = mkIcon(["M20 7h-9","M14 17H5","M17 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6z","M7 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"]);
+const ShieldCheck  = mkIcon(["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z","M9 12l2 2 4-4"]);
+const ShoppingBag  = mkIcon(["M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z","M3 6h18","M16 10a4 4 0 0 1-8 0"]);
+const Sparkles     = mkIcon(["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"]);
+const Star         = mkIcon(["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"],"currentColor");
+const Sun          = mkIcon(["M12 1v2","M12 21v2","M4.22 4.22l1.42 1.42","M18.36 18.36l1.42 1.42","M1 12h2","M21 12h2","M4.22 19.78l1.42-1.42","M18.36 5.64l1.42-1.42","M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7z"]);
+const Trash2       = mkIcon(["M3 6h18","M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2","M10 11v6","M14 11v6"]);
+const Upload       = mkIcon(["M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4","M17 8l-5-5-5 5","M12 3v12"]);
+const User         = mkIcon(["M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2","M12 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"]);
+const UserCheck    = mkIcon(["M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2","M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z","M22 11l-4 4-2-2"]);
+const X            = mkIcon(["M18 6L6 18","M6 6l12 12"]);
+const Youtube      = mkIcon(["M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z","M9.75 15.02l5.75-3.02-5.75-3.02v6.04z"]);
+
+/* ── App ───────────────────────────────────────────────────── */
+
+// App & Persistent Storage Configuration
+const STORAGE_PREFIX = "dosemate_wellness_v1";
+
+function loadStoredData(uid, key, fallback) {
+  if (!uid || typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(`${STORAGE_PREFIX}:${uid}:${key}`);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveStoredData(uid, key, value) {
+  if (!uid || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(`${STORAGE_PREFIX}:${uid}:${key}`, JSON.stringify(value));
+  } catch {
+    // Ignore storage quota errors
+  }
+}
+
+// Product Presets & Catalog Data
+const MAN_MATTERS_GUMMY_PRESETS = [
+  {
+    name: "Biotin Hair Gummies (No Added Sugar)",
+    defaultStock: 30,
+    defaultDose: 1,
+    defaultTimes: ["09:00"],
+    defaultMeal: "After meal",
+    reorderUrl: "https://man.matters",
+  },
+  {
+    name: "Stage 2 Hair Growth Kit (Minoxidil 5% + Biotin)",
+    defaultStock: 60,
+    defaultDose: 2,
+    defaultTimes: ["09:00", "21:00"],
+    defaultMeal: "After meal",
+    reorderUrl: "https://man.matters",
+  },
+  {
+    name: "Pure Himalayan Shilajit Gummies",
+    defaultStock: 30,
+    defaultDose: 2,
+    defaultTimes: ["08:30", "17:00"],
+    defaultMeal: "After meal",
+    reorderUrl: "https://man.matters",
+  },
+  {
+    name: "Melatonin Deep Sleep Gummies",
+    defaultStock: 30,
+    defaultDose: 1,
+    defaultTimes: ["22:00"],
+    defaultMeal: "After meal",
+    reorderUrl: "https://man.matters",
+  },
+  {
+    name: "BeardMax Beard Growth Serum (Redensyl)",
+    defaultStock: 30,
+    defaultDose: 1,
+    defaultTimes: ["21:30"],
+    defaultMeal: "Before meal",
+    reorderUrl: "https://man.matters",
+  },
+  {
+    name: "Apple Cider Vinegar Weight Management Gummies",
+    defaultStock: 30,
+    defaultDose: 2,
+    defaultTimes: ["08:30", "13:00"],
+    defaultMeal: "Before meal",
+    reorderUrl: "https://man.matters",
+  },
+];
+
+const MAN_MATTERS_PRODUCTS = [
+  {
+    id: "prod-biotin-gummies",
+    category: "Hair",
+    badge: "BESTSELLER",
+    bgTint: "#E3F2EC",
+    accent: "#276B50",
+    name: "Biotin Hair Gummies (No Added Sugar)",
+    actives: "5000 mcg Biotin · Zinc · Vitamin A, C & E",
+    benefit: "Strengthens hair follicles, reduces breakage, and supports thicker hair growth.",
+    rating: "4.8",
+    reviews: "14.2k",
+    price: 499,
+    mrp: 699,
+    url: "https://man.matters",
+  },
+  {
+    id: "prod-minoxidil-5",
+    category: "Hair",
+    badge: "CLINICALLY PROVEN",
+    bgTint: "#EAEFF9",
+    accent: "#3D4E7A",
+    name: "Minoxidil 5% Topical Solution (Alcohol-Free)",
+    actives: "5% Minoxidil · Procapil · Lipid Base",
+    benefit: "Reactivates dormant hair follicles and improves scalp blood circulation without dryness.",
+    rating: "4.7",
+    reviews: "9.8k",
+    price: 649,
+    mrp: 899,
+    url: "https://man.matters",
+  },
+  {
+    id: "prod-redensyl-tonic",
+    category: "Hair",
+    badge: "STAGE 1-2 CARE",
+    bgTint: "#FDF2D8",
+    accent: "#8A5D0A",
+    name: "Advanced Hair Tonic with Redensyl & Saw Palmetto",
+    actives: "3% Redensyl · Saw Palmetto · Biotin",
+    benefit: "Targets DHT buildup and boosts new anagen phase hair sprouts with zero side effects.",
+    rating: "4.6",
+    reviews: "6.4k",
+    price: 599,
+    mrp: 799,
+    url: "https://man.matters",
+  },
+  {
+    id: "prod-shilajit-gummies",
+    category: "Performance",
+    badge: "STAMINA & ENERGY",
+    bgTint: "#FCECE8",
+    accent: "#B54434",
+    name: "Pure Himalayan Shilajit & Ashwagandha Gummies",
+    actives: "75% Fulvic Acid Shilajit · KSM-66 Ashwagandha",
+    benefit: "Boosts daily stamina, workout recovery, and natural vitality with zero bitterness.",
+    rating: "4.8",
+    reviews: "11.5k",
+    price: 549,
+    mrp: 749,
+    url: "https://man.matters",
+  },
+  {
+    id: "prod-beard-serum",
+    category: "Beard",
+    badge: "PATCHY BEARD",
+    bgTint: "#E3F2EC",
+    accent: "#276B50",
+    name: "BeardMax Beard Growth Serum",
+    actives: "Redensyl · Argan Oil · Vitamin E",
+    benefit: "Nourishes facial hair roots to fill patchy spots and soften coarse beard strands.",
+    rating: "4.5",
+    reviews: "5.1k",
+    price: 449,
+    mrp: 599,
+    url: "https://man.matters",
+  },
+  {
+    id: "prod-sleep-gummies",
+    category: "Wellness & Sleep",
+    badge: "DEEP RECOVERY",
+    bgTint: "#EAEFF9",
+    accent: "#3D4E7A",
+    name: "Melatonin & Chamomile Deep Sleep Gummies",
+    actives: "3 mg Melatonin · L-Theanine · Chamomile",
+    benefit: "Helps you fall asleep faster and wake up refreshed without morning grogginess.",
+    rating: "4.7",
+    reviews: "7.3k",
+    price: 399,
+    mrp: 549,
+    url: "https://man.matters",
+  },
+];
+
+const emptyForm = {
+  product_name: MAN_MATTERS_GUMMY_PRESETS[0].name,
+  is_custom_product: false,
+  gummies_remaining: 30,
+  daily_dose: 1,
+  reminder_time: "09:00",
+  meal_timing: "After meal",
+  dose_schedules: [{ time: "09:00", meal: "After meal" }],
+  reorder_threshold: 7,
+  reorder_url: "https://man.matters",
+  reminder_enabled: true,
+};
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function daysRemaining(tracker) {
+  const dose = Math.max(1, Number(tracker?.daily_dose) || 1);
+  const stock = Math.max(0, Number(tracker?.gummies_remaining) || 0);
+  return Math.floor(stock / dose);
+}
+
+function isLowOnStock(tracker) {
+  const threshold = Number(tracker?.reorder_threshold ?? 7);
+  return daysRemaining(tracker) <= threshold;
+}
+
+function generateHairSnapshotSvg(stage = "day1") {
+  const density = stage === "day24" ? 36 : stage === "day14" ? 24 : 14;
+  const label =
+    stage === "day24"
+      ? "DAY 24 · STRONGER DENSITY"
+      : stage === "day14"
+      ? "DAY 14 · BABY SPROUTS"
+      : "DAY 01 · BASELINE SCAN";
+
+  const strands = Array.from({ length: density }, (_, i) => {
+    const x = 65 + ((i * 270) % 270);
+    const y = 42 + ((i * 19) % 55);
+    const height = stage === "day24" ? 26 : stage === "day14" ? 20 : 14;
+    return `<path d="M${x} ${y + height} Q${x + (i % 2 === 0 ? 4 : -4)} ${
+      y + height / 2
+    } ${x + (i % 3 === 0 ? 6 : -3)} ${y}" stroke="#1E2D27" stroke-width="${
+      stage === "day24" ? "2.4" : "1.8"
+    }" stroke-linecap="round" fill="none" opacity="0.82"/>`;
+  }).join("");
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#E7F2EC"/>
+        <stop offset="100%" stop-color="#D4E5DC"/>
+      </linearGradient>
+    </defs>
+    <rect width="400" height="220" fill="url(#bg)"/>
+    <ellipse cx="200" cy="145" rx="125" ry="95" fill="#F2D7C4" stroke="#DFC0AA" stroke-width="2"/>
+    <path d="M85 118 Q200 72 315 118" stroke="#388E6C" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+    ${strands}
+    <rect x="16" y="16" width="175" height="26" rx="8" fill="#163A2E" opacity="0.9"/>
+    <text x="28" y="33" fill="#FFFFFF" font-family="sans-serif" font-size="10" font-weight="bold">${label}</text>
+  </svg>`;
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function createSeedCheckups() {
+  const day14Date = new Date();
+  day14Date.setDate(day14Date.getDate() - 2);
+  const day1Date = new Date();
+  day1Date.setDate(day1Date.getDate() - 15);
+
+  return [
+    {
+      id: "seed-day-1",
+      dayNumber: 1,
+      date: localDateKey(day1Date),
+      angle: "Hairline",
+      hairFallCount: "50–100 strands",
+      thicknessFeel: "Slightly thinner",
+      scalpCondition: "Clean & balanced",
+      babyHairs: "None yet",
+      note: "Baseline checkup before starting daily Biotin & Redensyl regimen.",
+      gummiesTakenSoFar: 1,
+      imageUrl: generateHairSnapshotSvg("day1"),
+      isSimulated: true,
+    },
+    {
+      id: "seed-day-14",
+      dayNumber: 14,
+      date: localDateKey(day14Date),
+      angle: "Hairline",
+      hairFallCount: "20–50 strands",
+      thicknessFeel: "Same as before",
+      scalpCondition: "Clean & balanced",
+      babyHairs: "Fine fuzz",
+      note: "Noticeably fewer strands on pillow and fine baby hairs along temples.",
+      gummiesTakenSoFar: 14,
+      imageUrl: generateHairSnapshotSvg("day14"),
+      isSimulated: true,
+    },
+  ];
+}
+
+async function askSahilGemini(userText, history, userContext) {
+  const lower = userText.toLowerCase();
+
+  if (lower.includes("routine") || lower.includes("review")) {
+    return `Here's your current snapshot${
+      userContext.userName ? `, ${userContext.userName}` : ""
+    }:\n• Active products: ${
+      userContext.activeProducts || "Biotin Hair Gummies"
+    }\n• Current streak: ${userContext.streak} day(s) · Journey Day ${
+      userContext.journeyDay
+    }\n\nTip: Taking Biotin gummies right after breakfast improves absorption, and consistency over 12 weeks delivers peak follicle strength.`;
+  }
+  if (lower.includes("minoxidil") || lower.includes("biotin")) {
+    return "Biotin Hair Gummies nourish hair follicles internally with essential vitamins & zinc, while Minoxidil 5% works topically to increase scalp blood flow. Using both together is our gold-standard Stage 2 hair regrowth combo!";
+  }
+  if (lower.includes("boost") || lower.includes("result") || lower.includes("hair")) {
+    return "To maximize hair results:\n1. Never miss your daily dose window.\n2. Keep scalp clean with a gentle anti-DHT shampoo 3x a week.\n3. Aim for 7+ hours of sleep and log a weekly hairline photo in your Progress tab.";
+  }
+
+  return `Great question! Based on your ${
+    userContext.concerns?.[0] || "wellness"
+  } focus, staying consistent with your daily ${
+    userContext.activeProducts || "Dosemate routine"
+  } is key. Would you like tips on optimal meal timing or pairing products?`;
+}
+
+/**
+ * Shared Outer Web Shell with Toast Notifications
+ */
+function WebAppShell({ children, toasts = [] }) {
+  return (
+    <div className="flex min-h-screen flex-col bg-[#F4F7F5] text-[#1A2B24] antialiased">
+      {children}
+
+      {/* Floating Toast Stack */}
+      {toasts.length > 0 && (
+        <div
+          aria-live="polite"
+          className="fixed top-20 right-4 z-50 flex flex-col gap-2 sm:right-6"
+        >
+          {toasts.map((t) => (
+            <div
+              key={t.id}
+              className={`flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-xs font-bold shadow-lg transition ${
+                t.type === "error"
+                  ? "border-[#F5C6BA] bg-[#FDF6F4] text-[#9C331C]"
+                  : t.type === "info"
+                  ? "border-[#DCE5DF] bg-white text-[#1A2B24]"
+                  : "border-[#BFE3D3] bg-[#163A2E] text-white"
+              }`}
+            >
+              <CircleCheck size={15} className="shrink-0" />
+              <span>{String(t.message)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Dedicated Sign-In / Sign-Up Landing Screen
+ */
+function SignInScreen({
+  authMode,
+  setAuthMode,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  authBusy,
+  submitAuth,
+  signInWithGoogle,
+  signInAsGuest,
+}) {
+  return (
+    <div className="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-6">
+      <div className="grid w-full grid-cols-1 overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-xl lg:grid-cols-12">
+        {/* Left Brand Showcase */}
+        <div className="flex flex-col justify-between bg-[#163A2E] p-8 text-white sm:p-10 lg:col-span-6">
+          <div>
+            <div className="inline-flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs">
+                <ShieldCheck size={20} />
+              </span>
+              <div className="flex flex-col leading-tight">
+                <span className="text-lg font-extrabold tracking-tight">
+                  Dose<span className="font-normal text-[#A8C4B8]">mate</span>
+                </span>
+                <span className="text-[10px] font-semibold tracking-wider text-[#86E3C3] uppercase">
+                  Powered by Man Matters
+                </span>
+              </div>
+            </div>
+
+            <h1 className="mt-8 text-3xl leading-tight font-extrabold sm:text-4xl">
+              Your daily men&apos;s wellness &amp; hair growth companion.
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-[#A8C4B8]">
+              Track daily gummy &amp; tonic doses, monitor bottle supply before running out, and compare real hairline progress photos.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-3 border-t border-white/10 pt-6 text-xs text-[#D5E6DF]">
+            <div className="flex items-center gap-2.5">
+              <CircleCheck size={16} className="text-[#86E3C3]" />
+              <span>Smart meal-timed reminders &amp; streak tracking</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CircleCheck size={16} className="text-[#86E3C3]" />
+              <span>Before &amp; after hairline split-slider checkups</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CircleCheck size={16} className="text-[#86E3C3]" />
+              <span>24/7 guidance from Dosemate AI specialist</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Authentication Form */}
+        <div className="flex flex-col justify-center p-8 sm:p-10 lg:col-span-6">
+          <div className="mb-6 flex rounded-2xl bg-[#F4F7F5] p-1">
+            <button
+              type="button"
+              onClick={() => setAuthMode("signin")}
+              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
+                authMode === "signin"
+                  ? "bg-white text-[#1A2B24] shadow-2xs"
+                  : "text-[#5E736A]"
+              }`}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMode("signup")}
+              className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
+                authMode === "signup"
+                  ? "bg-white text-[#1A2B24] shadow-2xs"
+                  : "text-[#5E736A]"
+              }`}
+            >
+              Create account
+            </button>
+          </div>
+
+          <form onSubmit={(e) => void submitAuth(e)} className="space-y-4">
+            <div>
+              <label htmlFor="auth-email" className="block text-xs font-bold text-[#3E4C59]">
+                Email address
+              </label>
+              <input
+                id="auth-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="arjun@example.com"
+                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-3 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="auth-password"
+                className="block text-xs font-bold text-[#3E4C59]"
+              >
+                Password
+              </label>
+              <input
+                id="auth-password"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-3 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={authBusy}
+              className="w-full rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] disabled:opacity-60"
+            >
+              {authBusy
+                ? "Please wait…"
+                : authMode === "signup"
+                ? "Create Account & Personalize"
+                : "Sign In to Dashboard"}
+            </button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3 text-[11px] font-bold text-[#72877E]">
+            <span className="h-px flex-1 bg-[#EAEFEA]" />
+            <span>OR CONTINUE WITH</span>
+            <span className="h-px flex-1 bg-[#EAEFEA]" />
+          </div>
+
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              disabled={authBusy}
+              onClick={() => void signInWithGoogle()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] bg-white py-3 text-xs font-bold text-[#1A2B24] transition hover:bg-[#F4F7F5]"
+            >
+              <UserCheck size={15} className="text-[#388E6C]" />
+              <span>Continue with Google</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={authBusy}
+              onClick={() => void signInAsGuest()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#BFE3D3] bg-[#E3F2EC]/70 py-3 text-xs font-bold text-[#163A2E] transition hover:bg-[#E3F2EC]"
+            >
+              <Sparkles size={15} className="text-[#388E6C]" />
+              <span>Continue as Instant Guest</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Post-Sign-In Health Profile & Onboarding Assessment Wizard (One Question at a Time)
+ */
+function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip }) {
+  const defaultName =
+    existingProfile?.fullName ||
+    (userEmail && !userEmail.includes("guest")
+      ? userEmail
+          .split("@")[0]
+          .replace(/[._-]/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase())
+      : "");
+
+  const [step, setStep] = useState(0);
+  const [fullName, setFullName] = useState(defaultName);
+  const [age, setAge] = useState(existingProfile?.age || 28);
+  const [concerns, setConcerns] = useState(
+    existingProfile?.concerns || ["Hair Fall & Thinning"]
+  );
+  const [hairStage, setHairStage] = useState(
+    existingProfile?.hairStage || "Stage 2 (Receding temples)"
+  );
+  const [sleepHours, setSleepHours] = useState(existingProfile?.sleepHours || "6–7 hrs");
+  const [stressLevel, setStressLevel] = useState(existingProfile?.stressLevel || "Moderate");
+  const [selectedProducts, setSelectedProducts] = useState(
+    existingProfile?.selectedProducts || ["Biotin Hair Gummies (No Added Sugar)"]
+  );
+  const [customProductText, setCustomProductText] = useState("");
+  const [goalHorizon, setGoalHorizon] = useState(existingProfile?.goalHorizon || "12 Weeks");
+  const [preferredReminder, setPreferredReminder] = useState(
+    existingProfile?.preferredReminder || "09:00"
+  );
+  const [submitting, setSubmitting] = useState(false);
+
+  const TOTAL_STEPS = 5;
+
+  const CONCERN_OPTIONS = [
+    "Hair Fall & Thinning",
+    "Patchy Beard",
+    "Daily Energy & Stamina",
+    "Deep Sleep & Stress",
+    "Weight & Gut Health",
+    "Dandruff & Scalp Care",
+  ];
+
+  const HAIR_STAGES = [
+    "Stage 1 (Minimal / Prevention)",
+    "Stage 2 (Receding temples)",
+    "Stage 3 (Crown & hairline thinning)",
+    "Stage 4+ (Advanced thinning)",
+  ];
+
+  function toggleConcern(item) {
+    setConcerns((prev) =>
+      prev.includes(item)
+        ? prev.length > 1
+          ? prev.filter((c) => c !== item)
+          : prev
+        : [...prev, item]
+    );
+  }
+
+  function toggleProduct(name) {
+    setSelectedProducts((prev) =>
+      prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name]
+    );
+  }
+
+  function handleAddCustomProduct() {
+    const trimmed = customProductText.trim();
+    if (!trimmed) return;
+    if (!selectedProducts.includes(trimmed)) {
+      setSelectedProducts((prev) => [...prev, trimmed]);
+    }
+    setCustomProductText("");
+  }
+
+  async function handleFinish(overrideProfile = null) {
+    setSubmitting(true);
+    const profileData = overrideProfile || {
+      fullName: fullName.trim() || "Arjun",
+      age: Number(age) || 28,
+      sleepHours,
+      stressLevel,
+      concerns,
+      hairStage,
+      selectedProducts:
+        selectedProducts.length > 0
+          ? selectedProducts
+          : ["Biotin Hair Gummies (No Added Sugar)"],
+      goalHorizon,
+      preferredReminder,
+      avatarUrl: existingProfile?.avatarUrl || "",
+      completedAt: new Date().toISOString(),
+    };
+    await onComplete(profileData);
+    setSubmitting(false);
+  }
+
+  async function handleSkipNow() {
+    if (onSkip) {
+      onSkip();
+      return;
+    }
+    await handleFinish({
+      fullName: fullName.trim() || defaultName || "Member",
+      age: Number(age) || 28,
+      sleepHours: "6–7 hrs",
+      stressLevel: "Moderate",
+      concerns: ["Hair Fall & Thinning"],
+      hairStage: "Stage 1 (Minimal / Prevention)",
+      selectedProducts: ["Biotin Hair Gummies (No Added Sugar)"],
+      goalHorizon: "12 Weeks",
+      preferredReminder: "09:00",
+      avatarUrl: existingProfile?.avatarUrl || "",
+      skippedAt: new Date().toISOString(),
+    });
+  }
+
+  function handleNext(e) {
+    if (e) e.preventDefault();
+    if (step < TOTAL_STEPS - 1) {
+      setStep((s) => s + 1);
+    } else {
+      void handleFinish();
+    }
+  }
+
+  const progressPercent = Math.round(((step + 1) / TOTAL_STEPS) * 100);
+
+  return (
+    <div className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-2xl flex-col justify-center px-4 py-8 sm:px-6">
+      <div className="overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-xl">
+        {/* Top Progress Header with Prominent Skip Option */}
+        <div className="border-b border-[#EAEFEA] bg-[#F9FBFA] px-6 py-4 sm:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E3F2EC] text-[#388E6C]">
+                <Sparkles size={13} />
+              </span>
+              <span className="text-xs font-bold tracking-wide text-[#5E736A]">
+                Step {step + 1} of {TOTAL_STEPS}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => void handleSkipNow()}
+              className="rounded-xl px-3 py-1.5 text-xs font-bold text-[#5E736A] transition hover:bg-[#EAEFEA] hover:text-[#1A2B24] disabled:opacity-50"
+            >
+              Skip for now →
+            </button>
+          </div>
+
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#E4ECE7]">
+            <div
+              className="h-full rounded-full bg-[#388E6C] transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Single-Question Interactive Body */}
+        <form onSubmit={handleNext} className="p-6 sm:p-10">
+          {step === 0 && (
+            <div className="space-y-6">
+              <div>
+                <span className="inline-block rounded-full bg-[#E3F2EC] px-3 py-1 text-[11px] font-bold text-[#276B50]">
+                  Welcome to Dosemate · Powered by Man Matters 👋
+                </span>
+                <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-[#1A2B24] sm:text-3xl">
+                  Let&apos;s personalize your journey.
+                </h1>
+                <p className="mt-1.5 text-sm text-[#5E736A]">
+                  First, what should we call you?
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="sm:col-span-2">
+                  <label htmlFor="onb-name" className="block text-xs font-bold text-[#3E4C59]">
+                    First name
+                  </label>
+                  <input
+                    id="onb-name"
+                    type="text"
+                    autoFocus
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Arjun"
+                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="onb-age" className="block text-xs font-bold text-[#3E4C59]">
+                    Age
+                  </label>
+                  <input
+                    id="onb-age"
+                    type="number"
+                    min={18}
+                    max={85}
+                    required
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    className="mt-1.5 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C] focus:bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                  What&apos;s your main focus right now{fullName ? `, ${fullName.split(" ")[0]}` : ""}?
+                </h2>
+                <p className="mt-1 text-xs text-[#5E736A]">Pick one or more goals.</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                {CONCERN_OPTIONS.map((item) => {
+                  const active = concerns.includes(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => toggleConcern(item)}
+                      className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-xs font-bold transition ${
+                        active
+                          ? "border-[#388E6C] bg-[#E3F2EC] text-[#163A2E] shadow-2xs"
+                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#485C53] hover:bg-[#F4F7F5]"
+                      }`}
+                    >
+                      <span>{item}</span>
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                          active ? "bg-[#388E6C] text-white" : "border border-[#CFD8D3] bg-white"
+                        }`}
+                      >
+                        {active && <Check size={12} />}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                  Quick hair &amp; lifestyle check
+                </h2>
+                <p className="mt-1 text-xs text-[#5E736A]">
+                  Helps Dosemate AI tailor daily tips for you.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">Hair stage</label>
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {HAIR_STAGES.map((stage) => (
+                    <button
+                      key={stage}
+                      type="button"
+                      onClick={() => setHairStage(stage)}
+                      className={`flex items-center justify-between rounded-2xl border px-3.5 py-3 text-left text-xs font-bold transition ${
+                        hairStage === stage
+                          ? "border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
+                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                      }`}
+                    >
+                      <span>{stage}</span>
+                      {hairStage === stage && <Check size={14} className="shrink-0 text-[#388E6C]" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-bold text-[#3E4C59]">Nightly sleep</label>
+                  <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                    {["< 6 hrs", "6–7 hrs", "7–8+ hrs"].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setSleepHours(opt)}
+                        className={`rounded-xl py-2.5 text-xs font-bold transition ${
+                          sleepHours === opt
+                            ? "bg-[#388E6C] text-white"
+                            : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A]"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#3E4C59]">Stress level</label>
+                  <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                    {["Low", "Moderate", "High"].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setStressLevel(opt)}
+                        className={`rounded-xl py-2.5 text-xs font-bold transition ${
+                          stressLevel === opt
+                            ? "bg-[#388E6C] text-white"
+                            : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A]"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                  Using any supplements or tonics already?
+                </h2>
+                <p className="mt-1 text-xs text-[#5E736A]">
+                  We&apos;ll set up your daily dose trackers automatically.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {MAN_MATTERS_GUMMY_PRESETS.map((preset) => {
+                  const checked = selectedProducts.includes(preset.name);
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => toggleProduct(preset.name)}
+                      className={`flex items-center justify-between gap-2 rounded-2xl border p-3 text-left text-xs font-bold transition ${
+                        checked
+                          ? "border-[#388E6C] bg-[#E3F2EC]/70 text-[#163A2E]"
+                          : "border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-white"
+                      }`}
+                    >
+                      <span className="line-clamp-1">{preset.name}</span>
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
+                          checked
+                            ? "bg-[#388E6C] text-white"
+                            : "border border-[#D5DCE4] bg-white"
+                        }`}
+                      >
+                        {checked && <Check size={12} />}
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {selectedProducts
+                  .filter((name) => !MAN_MATTERS_GUMMY_PRESETS.some((p) => p.name === name))
+                  .map((customName) => (
+                    <button
+                      key={customName}
+                      type="button"
+                      onClick={() => toggleProduct(customName)}
+                      className="flex items-center justify-between gap-2 rounded-2xl border border-[#388E6C] bg-[#E3F2EC]/70 p-3 text-left text-xs font-bold text-[#163A2E]"
+                    >
+                      <span className="line-clamp-1">{customName}</span>
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#388E6C] text-white">
+                        <Check size={12} />
+                      </span>
+                    </button>
+                  ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customProductText}
+                  onChange={(e) => setCustomProductText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomProduct();
+                    }
+                  }}
+                  placeholder="+ Add custom product..."
+                  className="flex-1 rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C] focus:bg-white"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomProduct}
+                  className="rounded-xl border border-[#388E6C] bg-[#E3F2EC] px-4 py-2 text-xs font-bold text-[#276B50] transition hover:bg-[#388E6C] hover:text-white"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight text-[#1A2B24]">
+                  When should we remind you?
+                </h2>
+                <p className="mt-1 text-xs text-[#5E736A]">
+                  Consistency is key—pick a goal horizon and daily reminder time.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">Goal timeline</label>
+                <div className="mt-2 grid grid-cols-3 gap-2.5">
+                  {["8 Weeks", "12 Weeks", "24 Weeks"].map((goal) => (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() => setGoalHorizon(goal)}
+                      className={`rounded-2xl py-3 text-xs font-bold transition ${
+                        goalHorizon === goal
+                          ? "bg-[#388E6C] text-white shadow-2xs"
+                          : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="onb-time" className="block text-xs font-bold text-[#3E4C59]">
+                  Morning dose reminder
+                </label>
+                <input
+                  id="onb-time"
+                  type="time"
+                  value={preferredReminder}
+                  onChange={(e) => setPreferredReminder(e.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-[#D5DCE4] bg-[#F7F8FA] px-4 py-3 text-sm font-bold text-[#141A21] outline-none focus:border-[#388E6C] focus:bg-white"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Step Navigation Footer */}
+          <div className="mt-8 flex items-center justify-between gap-3 border-t border-[#EAEFEA] pt-5">
+            {step > 0 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-4 py-3 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]"
+              >
+                <ArrowLeft size={15} />
+                <span>Back</span>
+              </button>
+            ) : (
+              <div />
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#388E6C] px-6 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#2E775A] active:scale-[0.98] disabled:opacity-60"
+            >
+              <span>
+                {submitting
+                  ? "Setting up…"
+                  : step === TOTAL_STEPS - 1
+                  ? "Start My Journey"
+                  : "Continue"}
+              </span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Progress & Daily Hair Condition Page Component ("Progress")
+ */
+function HairCheckupPage({
+  today,
+  currentJourneyDay,
+  primaryGummyName,
+  totalGummiesConsumed,
+  checkups,
+  onAddCheckup,
+  onDeleteCheckup,
+  showToast,
+}) {
+  const [selectedAngle, setSelectedAngle] = useState("Hairline");
+  const [hairFallCount, setHairFallCount] = useState("20–50 strands");
+  const [thicknessFeel, setThicknessFeel] = useState("Same as before");
+  const [scalpCondition, setScalpCondition] = useState("Clean & balanced");
+  const [babyHairs, setBabyHairs] = useState("Fine fuzz");
+  const [note, setNote] = useState("");
+  const [customImage, setCustomImage] = useState(null);
+  const [compareDayA, setCompareDayA] = useState("1");
+  const [compareDayB, setCompareDayB] = useState("14");
+  const [sliderPos, setSliderPos] = useState(50);
+
+  const sortedCheckups = useMemo(
+    () => [...checkups].sort((a, b) => a.dayNumber - b.dayNumber),
+    [checkups]
+  );
+
+  const baselineSnapshot = useMemo(() => {
+    return (
+      sortedCheckups.find((c) => c.dayNumber.toString() === compareDayA) ||
+      sortedCheckups[0]
+    );
+  }, [sortedCheckups, compareDayA]);
+
+  const selectedSnapshot = useMemo(() => {
+    return (
+      sortedCheckups.find((c) => c.dayNumber.toString() === compareDayB) ||
+      sortedCheckups[sortedCheckups.length - 1] ||
+      sortedCheckups[0]
+    );
+  }, [sortedCheckups, compareDayB]);
+
+  const todayLogged = checkups.some((c) => c.date === today);
+
+  async function handleCaptureToday(e) {
+    e.preventDefault();
+    const simulatedSvg = generateHairSnapshotSvg(
+      currentJourneyDay > 20 ? "day24" : currentJourneyDay > 10 ? "day14" : "day1"
+    );
+    const newEntry = {
+      id: `checkup-${Date.now()}`,
+      dayNumber: currentJourneyDay,
+      date: today,
+      angle: selectedAngle,
+      hairFallCount,
+      thicknessFeel,
+      scalpCondition,
+      babyHairs,
+      note:
+        note.trim() ||
+        `Day ${currentJourneyDay}: Hair fall ${hairFallCount}, thickness feels ${thicknessFeel.toLowerCase()}.`,
+      gummiesTakenSoFar: totalGummiesConsumed,
+      imageUrl: customImage || simulatedSvg,
+      isSimulated: !customImage,
+    };
+    await onAddCheckup(newEntry);
+    setCompareDayB(String(currentJourneyDay));
+    setNote("");
+    setCustomImage(null);
+  }
+
+  function handleFileUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 750_000) {
+      showToast("Please select a photo under 750 KB for fast storage.", "error");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCustomImage(event.target?.result);
+      showToast("Photo uploaded and ready to save!", "success");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col justify-between gap-3 border-b border-[#DCE5DF] pb-5 sm:flex-row sm:items-end">
+        <div>
+          <span className="rounded-md bg-[#E3F2EC] px-2.5 py-1 text-[11px] font-bold text-[#388E6C]">
+            DAY {currentJourneyDay} HAIR JOURNEY
+          </span>
+          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+            Hair Growth &amp; Condition Checkup
+          </h1>
+          <p className="mt-1 text-sm text-[#5E736A]">
+            Log daily hair fall, thickness feel, and visual snapshots to track real changes over time.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[#DCE5DF] bg-white px-4 py-2.5 text-xs font-semibold text-[#3E4C59]">
+          Primary Regimen: <strong className="text-[#1A2B24]">{primaryGummyName}</strong> ·{" "}
+          <span className="text-[#388E6C]">{totalGummiesConsumed} doses logged</span>
+        </div>
+      </div>
+
+      {/* Main 2-Column Workspace */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Left Column: Daily Check-In Questions & Photo Capture */}
+        <div className="lg:col-span-6">
+          <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl font-bold ${
+                    todayLogged ? "bg-[#388E6C] text-white" : "bg-[#FDF2D8] text-[#B87D14]"
+                  }`}
+                >
+                  {todayLogged ? <Check size={18} /> : <Camera size={18} />}
+                </span>
+                <div>
+                  <h2 className="text-base font-bold text-[#1A2B24]">
+                    {todayLogged
+                      ? "Today's checkup is logged"
+                      : "Today's Condition & Photo Checkup"}
+                  </h2>
+                  <p className="text-xs text-[#5E736A]">
+                    Answer 4 quick questions to record today&apos;s hair response
+                  </p>
+                </div>
+              </div>
+              {todayLogged && (
+                <span className="rounded-full bg-[#E3F2EC] px-3 py-1 text-[11px] font-bold text-[#276B50]">
+                  LOGGED TODAY
+                </span>
+              )}
+            </div>
+
+            <form
+              onSubmit={(e) => void handleCaptureToday(e)}
+              className="mt-5 space-y-4 border-t border-[#EAEFEA] pt-5"
+            >
+              {/* Focus Area */}
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">
+                  1. Photo Focus Area
+                </label>
+                <div className="mt-1.5 grid grid-cols-3 gap-2">
+                  {["Hairline", "Crown", "Temples"].map((angle) => (
+                    <button
+                      key={angle}
+                      type="button"
+                      onClick={() => setSelectedAngle(angle)}
+                      className={`rounded-xl py-2 text-xs font-bold transition ${
+                        selectedAngle === angle
+                          ? "bg-[#388E6C] text-white shadow-2xs"
+                          : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                      }`}
+                    >
+                      {angle}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Question 2: Hair fall today */}
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">
+                  2. Roughly how many strands fell out today?
+                </label>
+                <div className="mt-1.5 grid grid-cols-2 gap-2">
+                  {["< 20 strands", "20–50 strands", "50–100 strands", "100+ strands"].map(
+                    (opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setHairFallCount(opt)}
+                        className={`rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
+                          hairFallCount === opt
+                            ? "border border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
+                            : "border border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Question 3: Thickness feel */}
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">
+                  3. How does your hair thickness feel compared to last week?
+                </label>
+                <div className="mt-1.5 grid grid-cols-3 gap-2">
+                  {["Thicker & fuller", "Same as before", "Slightly thinner"].map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setThicknessFeel(opt)}
+                      className={`rounded-xl px-2.5 py-2 text-center text-xs font-semibold transition ${
+                        thicknessFeel === opt
+                          ? "border border-[#388E6C] bg-[#E3F2EC] text-[#163A2E]"
+                          : "border border-[#DCE5DF] bg-[#F9FBFA] text-[#5E736A] hover:bg-[#F4F7F5]"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Question 4 & 5: Scalp & Baby hairs */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-bold text-[#3E4C59]">
+                    4. Scalp Condition
+                  </label>
+                  <select
+                    value={scalpCondition}
+                    onChange={(e) => setScalpCondition(e.target.value)}
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                  >
+                    <option value="Clean & balanced">Clean &amp; balanced</option>
+                    <option value="Oily / sweaty">Oily / sweaty</option>
+                    <option value="Itchy or flaky">Itchy or flaky</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#3E4C59]">
+                    5. New Baby Hair Growth
+                  </label>
+                  <select
+                    value={babyHairs}
+                    onChange={(e) => setBabyHairs(e.target.value)}
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3 py-2.5 text-xs font-semibold text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                  >
+                    <option value="None yet">None yet</option>
+                    <option value="Fine fuzz">Fine fuzz along temples</option>
+                    <option value="Visible sprouts">Visible thicker sprouts</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Optional Observation Note */}
+              <div>
+                <label className="block text-xs font-bold text-[#3E4C59]">
+                  Observation Note{" "}
+                  <span className="font-normal text-[#72877E]">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Less hair on pillow this morning..."
+                  className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] px-3.5 py-2.5 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C]"
+                />
+              </div>
+
+              {/* Snapshot Preview */}
+              <div className="relative overflow-hidden rounded-2xl border border-[#DCE5DF] bg-[#F4F7F5]">
+                <img
+                  src={
+                    customImage ||
+                    generateHairSnapshotSvg(currentJourneyDay > 20 ? "day24" : "day14")
+                  }
+                  alt="Hair checkup preview"
+                  className="mx-auto h-44 w-full object-cover"
+                />
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-3.5 py-2.5 text-white">
+                  <span className="text-[11px] font-bold tracking-wider uppercase">
+                    Day {currentJourneyDay} · {selectedAngle}
+                  </span>
+                  <span className="text-[10px] text-white/85">
+                    {customImage ? "Uploaded photo" : "Guided scan preview"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5 sm:flex-row">
+                <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DCE5DF] bg-white py-3 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]">
+                  <Upload size={15} />
+                  <span>Upload Real Photo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A]"
+                >
+                  <Camera size={15} />
+                  <span>Save Today&apos;s Checkup</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Column: Interactive Before & After Comparison Slider + Timeline */}
+        <div className="space-y-6 lg:col-span-6">
+          <section className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                  VISUAL COMPARISON
+                </p>
+                <h2 className="text-base font-bold text-[#1A2B24]">
+                  Before &amp; After Split Slider
+                </h2>
+              </div>
+              <span className="text-[#388E6C]">
+                <Columns2 size={18} />
+              </span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-[#5E736A]">
+                  BEFORE (BASELINE)
+                </label>
+                <select
+                  value={compareDayA}
+                  onChange={(e) => setCompareDayA(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs font-semibold text-[#1A2B24] outline-none"
+                >
+                  {sortedCheckups.map((c) => (
+                    <option key={c.id} value={c.dayNumber}>
+                      Day {c.dayNumber} ({c.angle})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-[#5E736A]">
+                  AFTER (PROGRESS)
+                </label>
+                <select
+                  value={compareDayB}
+                  onChange={(e) => setCompareDayB(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs font-semibold text-[#1A2B24] outline-none"
+                >
+                  {sortedCheckups.map((c) => (
+                    <option key={c.id} value={c.dayNumber}>
+                      Day {c.dayNumber} ({c.angle})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Interactive Split Overlay Viewer */}
+            <div className="relative mt-4 h-56 w-full overflow-hidden rounded-2xl border border-[#DCE5DF] bg-[#F4F7F5] select-none">
+              <img
+                src={selectedSnapshot?.imageUrl}
+                alt="After progress"
+                className="h-full w-full object-cover"
+              />
+              <div
+                className="absolute inset-y-0 left-0 overflow-hidden"
+                style={{ width: `${sliderPos}%` }}
+              >
+                <img
+                  src={baselineSnapshot?.imageUrl}
+                  alt="Before baseline"
+                  className="h-56 w-full max-w-none object-cover"
+                />
+              </div>
+
+              {/* Divider Line */}
+              <div
+                className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.45)]"
+                style={{ left: `${sliderPos}%` }}
+              >
+                <div className="absolute top-1/2 left-1/2 flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#1A2B24] text-[10px] font-bold text-white shadow">
+                  ↔
+                </div>
+              </div>
+
+              <span className="absolute top-3 left-3 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-bold text-white">
+                Day {baselineSnapshot?.dayNumber || 1}
+              </span>
+              <span className="absolute top-3 right-3 rounded-lg bg-[#388E6C] px-2.5 py-1 text-[10px] font-bold text-white">
+                Day {selectedSnapshot?.dayNumber || currentJourneyDay}
+              </span>
+            </div>
+
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-[11px] font-bold text-[#5E736A]">Slide to compare</span>
+              <input
+                type="range"
+                min={5}
+                max={95}
+                value={sliderPos}
+                onChange={(e) => setSliderPos(Number(e.target.value))}
+                aria-label="Compare before and after hair growth"
+                className="h-1.5 flex-1 cursor-pointer accent-[#388E6C]"
+              />
+            </div>
+          </section>
+
+          {/* Chronological Checkup Timeline */}
+          <section className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs sm:p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1A2B24]">
+                Checkup History &amp; Condition Logs
+              </h2>
+              <span className="rounded-full bg-[#F4F7F5] px-3 py-1 text-xs font-bold text-[#5E736A]">
+                {sortedCheckups.length} entries
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+              {sortedCheckups.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col justify-between rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5"
+                >
+                  <div>
+                    <div className="relative overflow-hidden rounded-xl border border-[#E1E6EB]">
+                      <img
+                        src={item.imageUrl}
+                        alt={`Day ${item.dayNumber}`}
+                        className="h-32 w-full object-cover"
+                      />
+                      <span className="absolute top-2 left-2 rounded-md bg-[#1A2B24]/85 px-2 py-0.5 font-mono text-[10px] font-bold text-white">
+                        DAY {item.dayNumber} · {item.angle}
+                      </span>
+                      {sortedCheckups.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => void onDeleteCheckup(item.id)}
+                          className="absolute top-2 right-2 rounded-lg bg-white/90 p-1.5 text-[#5E736A] transition hover:text-[#C94A38]"
+                          aria-label="Delete checkup"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {item.hairFallCount && (
+                        <span className="rounded-md bg-[#FDF2D8] px-2 py-0.5 text-[10px] font-bold text-[#8A5D0A]">
+                          Fall: {item.hairFallCount}
+                        </span>
+                      )}
+                      {item.thicknessFeel && (
+                        <span className="rounded-md bg-[#E3F2EC] px-2 py-0.5 text-[10px] font-bold text-[#276B50]">
+                          {item.thicknessFeel}
+                        </span>
+                      )}
+                      {item.babyHairs && item.babyHairs !== "None yet" && (
+                        <span className="rounded-md bg-[#EAEFF9] px-2 py-0.5 text-[10px] font-bold text-[#3D4E7A]">
+                          {item.babyHairs}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-2 text-xs leading-relaxed text-[#485C53]">{item.note}</p>
+                  </div>
+
+                  <p className="mt-2.5 border-t border-[#EAEFEA] pt-2 text-[10px] font-semibold text-[#72877E]">
+                    Logged on {item.date}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Products Catalog Web Page Component ("Products")
+ */
+function ProductsCatalogPage() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const categories = ["All", "Hair", "Performance", "Beard", "Wellness & Sleep"];
+
+  const filteredProducts = useMemo(() => {
+    return MAN_MATTERS_PRODUCTS.filter((prod) => {
+      const matchCat = selectedCategory === "All" || prod.category === selectedCategory;
+      const matchQuery =
+        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prod.actives.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prod.benefit.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCat && matchQuery;
+    });
+  }, [selectedCategory, searchQuery]);
+
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header + Search */}
+      <div className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] pb-5 md:flex-row md:items-end">
+        <div>
+          <span className="rounded-md bg-[#E3F2EC] px-2.5 py-1 text-[11px] font-bold text-[#388E6C]">
+            MAN MATTERS CURATED STORE
+          </span>
+          <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+            Doctor-Backed Men&apos;s Solutions
+          </h1>
+          <p className="mt-1 text-sm text-[#5E736A]">
+            Explore clinically evaluated gummies, tonics, and kits—click any product to view details &amp; reorder.
+          </p>
+        </div>
+
+        <div className="relative w-full md:w-80">
+          <span className="pointer-events-none absolute top-3 left-3.5 text-[#72877E]">
+            <Search size={16} />
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search Biotin, Minoxidil, Shilajit..."
+            className="w-full rounded-xl border border-[#DCE5DF] bg-white py-2.5 pr-4 pl-10 text-xs font-semibold text-[#1A2B24] shadow-2xs outline-none transition focus:border-[#388E6C]"
+          />
+        </div>
+      </div>
+
+      {/* Category Pills */}
+      <div className="flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCategory(cat)}
+            className={`rounded-full px-4 py-2 text-xs font-bold transition ${
+              selectedCategory === cat
+                ? "bg-[#388E6C] text-white shadow-sm"
+                : "border border-[#DCE5DF] bg-white text-[#5E736A] hover:bg-[#EAEFEA]"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Responsive 3-Column Product Catalog Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredProducts.map((prod) => (
+          <article
+            key={prod.id}
+            className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs transition hover:-translate-y-0.5 hover:border-[#388E6C] hover:shadow-md"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <span
+                  className="rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider"
+                  style={{ backgroundColor: prod.bgTint, color: prod.accent }}
+                >
+                  {prod.badge}
+                </span>
+                <div className="flex items-center gap-1 text-xs font-bold text-[#1A2B24]">
+                  <Star size={14} className="fill-[#F5B841] text-[#F5B841]" />
+                  <span>{prod.rating}</span>
+                  <span className="text-[11px] font-normal text-[#72877E]">({prod.reviews})</span>
+                </div>
+              </div>
+
+              <a
+                href={prod.url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 block text-base font-bold text-[#1A2B24] transition hover:text-[#388E6C]"
+              >
+                {prod.name}
+              </a>
+              <p className="mt-1 text-xs font-semibold text-[#388E6C]">{prod.actives}</p>
+              <p className="mt-2 text-xs leading-relaxed text-[#5E736A]">{prod.benefit}</p>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between border-t border-[#EAEFEA] pt-4">
+              <div>
+                <span className="text-base font-extrabold text-[#1A2B24]">₹{prod.price}</span>
+                <span className="ml-2 text-xs font-medium text-[#72877E] line-through">
+                  ₹{prod.mrp}
+                </span>
+              </div>
+
+              <a
+                href={prod.url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E6C] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition hover:bg-[#2E775A]"
+              >
+                <span>View on Site</span>
+                <ExternalLink size={13} />
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * User Profile, Editable Avatar, Man Matters Socials & App Rating Page ("Profile")
+ */
+function UserProfilePage({
+  user,
+  healthProfile,
+  displayName,
+  streak,
+  currentJourneyDay,
+  totalGummiesConsumed,
+  onUpdateAvatar,
+  onEditHealthProfile,
+  onSignOut,
+  showToast,
+}) {
+  const [rating, setRating] = useState(5);
+  const [hoveredStar, setHoveredStar] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+
+  const avatarUrl = healthProfile?.avatarUrl || "";
+
+  function handleAvatarFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 800_000) {
+      showToast("Please choose a profile picture under 800 KB.", "error");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const dataUrl = event.target?.result;
+      if (dataUrl) {
+        await onUpdateAvatar(String(dataUrl));
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleSubmitRating(e) {
+    e.preventDefault();
+    setRatingSubmitted(true);
+    showToast(`Thank you for rating Dosemate ${rating}/5 stars!`);
+  }
+
+  const MAN_MATTERS_SOCIALS = [
+    {
+      name: "Instagram",
+      handle: "@manmatters.official",
+      url: "https://www.instagram.com/manmatters.official/",
+      bg: "#FCECE8",
+      accent: "#B54434",
+      icon: <Instagram size={18} />,
+    },
+    {
+      name: "YouTube",
+      handle: "Man Matters",
+      url: "https://www.youtube.com/@ManMatters",
+      bg: "#FDF2D8",
+      accent: "#8A5D0A",
+      icon: <Youtube size={18} />,
+    },
+    {
+      name: "Official Website",
+      handle: "man.matters",
+      url: "https://man.matters",
+      bg: "#E3F2EC",
+      accent: "#276B50",
+      icon: <Globe size={18} />,
+    },
+  ];
+
+  return (
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      {/* Profile Hero & Editable Picture Card */}
+      <section className="rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs sm:p-8">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          {/* Editable Profile Avatar (Can be left as default monogram or customized) */}
+          <div className="relative shrink-0">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="h-24 w-24 rounded-full border-4 border-[#E3F2EC] object-cover shadow-sm"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#E3F2EC] bg-[#163A2E] text-3xl font-extrabold text-white shadow-sm">
+                {displayName.slice(0, 1).toUpperCase()}
+              </div>
+            )}
+
+            <label
+              title="Change profile picture"
+              className="absolute right-0 bottom-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#388E6C] text-white shadow-md transition hover:scale-105 hover:bg-[#2E775A]"
+            >
+              <Camera size={14} />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarFileChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* User Details & Optional Avatar Controls */}
+          <div className="flex-1 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E3F2EC] px-3 py-1 text-[10px] font-bold tracking-wider text-[#276B50] uppercase">
+              <ShieldCheck size={12} />
+              <span>Dosemate Member · Powered by Man Matters</span>
+            </div>
+            <h1 className="mt-2 text-2xl font-extrabold text-[#1A2B24]">{displayName}</h1>
+            <p className="mt-0.5 text-xs text-[#5E736A]">
+              {user?.email || "guest@dosemate.app"} · {healthProfile?.hairStage || "Daily Wellness"}
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3.5 py-2 text-xs font-bold text-[#1A2B24] transition hover:bg-[#E3F2EC] hover:text-[#276B50]">
+                <Camera size={14} />
+                <span>{avatarUrl ? "Change Photo" : "Upload Photo (Optional)"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarFileChange}
+                  className="hidden"
+                />
+              </label>
+
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => void onUpdateAvatar("")}
+                  className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white px-3 py-2 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                >
+                  <Trash2 size={13} />
+                  <span>Reset Default</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onEditHealthProfile}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-3.5 py-2 text-xs font-bold text-[#3E4C59] transition hover:bg-[#F4F7F5]"
+              >
+                <HeartPulse size={14} className="text-[#388E6C]" />
+                <span>Edit Health Goals</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Journey Stats Strip */}
+        <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[#EAEFEA] pt-5 text-center">
+          <div className="rounded-2xl bg-[#F9FBFA] p-3">
+            <p className="text-lg font-extrabold text-[#1A2B24]">{streak}</p>
+            <p className="text-[11px] font-bold text-[#667B72]">Day Streak</p>
+          </div>
+          <div className="rounded-2xl bg-[#F9FBFA] p-3">
+            <p className="text-lg font-extrabold text-[#388E6C]">Day {currentJourneyDay}</p>
+            <p className="text-[11px] font-bold text-[#667B72]">Journey</p>
+          </div>
+          <div className="rounded-2xl bg-[#F9FBFA] p-3">
+            <p className="text-lg font-extrabold text-[#1A2B24]">{totalGummiesConsumed}</p>
+            <p className="text-[11px] font-bold text-[#667B72]">Doses Logged</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Two-Column Lower Section: Man Matters Socials & Rate App */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Man Matters Official Socials */}
+        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs">
+          <div>
+            <span className="text-[11px] font-bold tracking-wider text-[#388E6C] uppercase">
+              COMMUNITY &amp; UPDATES
+            </span>
+            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24]">
+              Man Matters Socials
+            </h2>
+            <p className="mt-1 text-xs text-[#5E736A]">
+              Follow doctor-led hair, beard, and men&apos;s wellness tips across our official channels.
+            </p>
+
+            <div className="mt-4 space-y-2.5">
+              {MAN_MATTERS_SOCIALS.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5 transition hover:border-[#388E6C] hover:bg-white hover:shadow-2xs"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="flex h-10 w-10 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: social.bg, color: social.accent }}
+                    >
+                      {social.icon}
+                    </span>
+                    <div>
+                      <p className="text-xs font-extrabold text-[#1A2B24]">{social.name}</p>
+                      <p className="text-[11px] font-medium text-[#5E736A]">{social.handle}</p>
+                    </div>
+                  </div>
+                  <ExternalLink size={15} className="text-[#72877E]" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Rate Man Matters / Dosemate App */}
+        <section className="flex flex-col justify-between rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xs">
+          <div>
+            <span className="text-[11px] font-bold tracking-wider text-[#B87D14] uppercase">
+              YOUR FEEDBACK MATTERS
+            </span>
+            <h2 className="mt-1 text-lg font-extrabold text-[#1A2B24]">
+              Rate Man Matters App
+            </h2>
+            <p className="mt-1 text-xs text-[#5E736A]">
+              Enjoying your daily dose reminders &amp; progress tracker? Tap a star to rate your experience.
+            </p>
+
+            {ratingSubmitted ? (
+              <div className="mt-5 rounded-2xl border border-[#BFE3D3] bg-[#E3F2EC]/70 p-5 text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#388E6C] text-white">
+                  <Check size={18} />
+                </div>
+                <p className="mt-2.5 text-sm font-extrabold text-[#163A2E]">
+                  Thanks for your {rating}-Star Rating!
+                </p>
+                <p className="mt-1 text-xs text-[#276B50]">
+                  Your feedback helps us make Man Matters &amp; Dosemate even better.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setRatingSubmitted(false)}
+                  className="mt-3 text-xs font-bold text-[#388E6C] underline"
+                >
+                  Edit rating
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitRating} className="mt-5 space-y-4">
+                <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#EAEFEA] bg-[#F9FBFA] py-4">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const filled = (hoveredStar || rating) >= star;
+                    return (
+                      <button
+                        key={star}
+                        type="button"
+                        onMouseEnter={() => setHoveredStar(star)}
+                        onMouseLeave={() => setHoveredStar(0)}
+                        onClick={() => setRating(star)}
+                        aria-label={`Rate ${star} stars`}
+                        className="p-1 transition hover:scale-110"
+                      >
+                        <Star
+                          size={28}
+                          className={
+                            filled
+                              ? "fill-[#F5B841] text-[#F5B841]"
+                              : "text-[#CFD8D3]"
+                          }
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div>
+                  <label htmlFor="app-review" className="block text-xs font-bold text-[#3E4C59]">
+                    Quick note <span className="font-normal text-[#72877E]">(optional)</span>
+                  </label>
+                  <textarea
+                    id="app-review"
+                    rows={2}
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    placeholder="Tell us what you love or what we can improve..."
+                    className="mt-1.5 w-full rounded-xl border border-[#DCE5DF] bg-[#F9FBFA] p-3 text-xs text-[#1A2B24] outline-none focus:border-[#388E6C] focus:bg-white"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded-xl bg-[#388E6C] py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A]"
+                >
+                  Submit Rating
+                </button>
+              </form>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* Sign Out Footer Button */}
+      <div className="flex justify-end pt-2">
+        <button
+          type="button"
+          onClick={() => void onSignOut()}
+          className="inline-flex items-center gap-2 rounded-2xl border border-[#F5C6BA] bg-white px-5 py-3 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+        >
+          <LogOut size={15} />
+          <span>Sign Out of Dosemate</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Dosemate AI Product Specialist Chatbot Popup Component
+ */
+function SahilAIChatbot({
+  healthProfile,
+  trackers,
+  streak,
+  currentJourneyDay,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      id: "m-1",
+      sender: "bot",
+      text: `Hi${
+        healthProfile?.fullName ? ` ${healthProfile.fullName}` : ""
+      }! I'm your Dosemate specialist (Powered by Man Matters). Ask any queries about your active routine, Biotin gummies, Redensyl tonic, Minoxidil 5%, or Ashwagandha & Shilajit!`,
+    },
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isOpen, messages, isTyping]);
+
+  async function handleSend(e) {
+    e.preventDefault();
+    if (!input.trim() || isTyping) return;
+
+    const userText = input.trim();
+    setInput("");
+    const userMsg = { id: `m-${Date.now()}`, sender: "user", text: userText };
+    const updatedHistory = [...messages, userMsg];
+    setMessages(updatedHistory);
+    setIsTyping(true);
+
+    const userContext = {
+      userName: healthProfile?.fullName || "",
+      age: healthProfile?.age || "",
+      concerns: healthProfile?.concerns || [],
+      hairStage: healthProfile?.hairStage || "",
+      sleepHours: healthProfile?.sleepHours || "",
+      stressLevel: healthProfile?.stressLevel || "",
+      goalHorizon: healthProfile?.goalHorizon || "",
+      trackerCount: trackers.length,
+      activeProducts: trackers
+        .map((t) => `${t.product_name} (${t.gummies_remaining} units left)`)
+        .join(", "),
+      streak,
+      journeyDay: currentJourneyDay,
+    };
+
+    const botReply = await askSahilGemini(userText, messages, userContext);
+
+    setIsTyping(false);
+    setMessages((prev) => [
+      ...prev,
+      { id: `m-${Date.now() + 1}`, sender: "bot", text: botReply },
+    ]);
+  }
+
+  return (
+    <>
+      {/* Floating Bottom-Right Chat Trigger Button (Positioned above Bottom Navigation Bar) */}
+      <div className="fixed right-5 bottom-20 z-40 sm:right-7 sm:bottom-22">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Open Ask Queries chatbot"
+          className="flex items-center gap-2 rounded-full bg-[#163A2E] px-4 py-3 text-xs font-bold text-white shadow-2xl transition hover:scale-105 hover:bg-[#1E4D3D] active:scale-95"
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#388E6C] text-white">
+            {isOpen ? <X size={14} /> : <Bot size={15} />}
+          </span>
+          <span>{isOpen ? "Close Queries" : "Ask Queries"}</span>
+        </button>
+      </div>
+
+      {/* Responsive Desktop & Mobile Chat Popup Drawer */}
+      {isOpen && (
+        <div className="fixed right-4 bottom-36 left-4 z-50 flex h-[450px] flex-col overflow-hidden rounded-3xl border border-[#DCE5DF] bg-white shadow-2xl sm:right-7 sm:bottom-36 sm:left-auto sm:w-96">
+          {/* Chat Header */}
+          <div className="flex items-center justify-between bg-[#163A2E] px-4 py-3.5 text-white">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#244E41] text-[#86E3C3]">
+                <Bot size={18} />
+              </span>
+              <div>
+                <p className="text-xs font-bold">Ask Queries · Dosemate Specialist</p>
+                <p className="text-[10px] text-[#A8C4B8]">
+                  Powered by Man Matters · Instant AI Support
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() =>
+                  setMessages([
+                    {
+                      id: "m-1",
+                      sender: "bot",
+                      text: "Chat reset. What would you like to know about your Dosemate regimen or Man Matters products?",
+                    },
+                  ])
+                }
+                title="Reset chat"
+                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white/10 hover:text-white"
+              >
+                <RotateCcw size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+                className="rounded-full p-1.5 text-[#A8C4B8] transition hover:bg-white/10 hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Message List */}
+          <div className="flex-1 space-y-3 overflow-y-auto bg-[#F4F7F5] p-4">
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line shadow-2xs ${
+                    m.sender === "user"
+                      ? "rounded-br-sm bg-[#388E6C] text-white"
+                      : "rounded-bl-sm border border-[#DCE5DF] bg-white text-[#1A2B24]"
+                  }`}
+                >
+                  {m.text}
+                </div>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="rounded-2xl rounded-bl-sm border border-[#DCE5DF] bg-white px-3.5 py-2 text-xs text-[#5E736A]">
+                  Analyzing your profile…
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Quick Suggestion Chips */}
+          <div className="flex gap-1.5 overflow-x-auto border-t border-[#EAEFEA] bg-white px-3.5 py-2">
+            {[
+              "Review my current routine",
+              "Biotin vs Minoxidil?",
+              "How to boost hair results?",
+            ].map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => setInput(chip)}
+                className="shrink-0 rounded-full border border-[#DCE5DF] bg-[#F4F7F5] px-2.5 py-1 text-[10px] font-semibold text-[#485C53] transition hover:bg-[#E3F2EC] hover:text-[#388E6C]"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+
+          {/* Input Form */}
+          <form
+            onSubmit={(e) => void handleSend(e)}
+            className="flex items-center gap-2 border-t border-[#EAEFEA] bg-white p-3"
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask any query about your regimen..."
+              className="flex-1 rounded-xl border border-[#DCE5DF] bg-[#F4F7F5] px-3 py-2 text-xs text-[#1A2B24] outline-none transition focus:border-[#388E6C]"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || isTyping}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs transition hover:bg-[#2E775A] disabled:opacity-50"
+            >
+              <Send size={15} />
+            </button>
+          </form>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Main Dosemate Web Application with Local Persistence & Immediate Login Screen
+ */
+function App() {
+  const [user, setUser] = useState(null);
+  const [authMode, setAuthMode] = useState("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
+
+  const [healthProfile, setHealthProfile] = useState(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+
+  const [activeTab, setActiveTab] = useState("routine");
+  const [trackers, setTrackers] = useState([]);
+  const [logs, setLogs] = useState([]);
+  const [checkups, setCheckups] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [today, setToday] = useState("");
+  const [minute, setMinute] = useState("");
+  const [workingId, setWorkingId] = useState(null);
+  const [notifications, setNotifications] = useState("unsupported");
+  const [toasts, setToasts] = useState([]);
+  const sentNotificationsRef = useRef(new Set());
+
+  function showToast(message, type = "success") {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((item) => item.id !== id));
+    }, 3400);
+  }
+
+  // Clock & Notification Permission Initialization
+  useEffect(() => {
+    setToday(localDateKey());
+    const refreshClock = () => setMinute(new Date().toTimeString().slice(0, 5));
+    refreshClock();
+    const clock = window.setInterval(refreshClock, 15_000);
+
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setNotifications(Notification.permission);
+    }
+
+    return () => window.clearInterval(clock);
+  }, []);
+
+  // Hydrate User Session Data from Local Storage on Login
+  useEffect(() => {
+    if (!user?.uid) return;
+    setHealthProfile(loadStoredData(user.uid, "profile", null));
+    setTrackers(loadStoredData(user.uid, "trackers", []));
+    setLogs(loadStoredData(user.uid, "logs", []));
+    const storedCheckups = loadStoredData(user.uid, "checkups", null);
+    setCheckups(storedCheckups && storedCheckups.length > 0 ? storedCheckups : createSeedCheckups());
+  }, [user?.uid]);
+
+  // Scheduled Dose & Low-Stock Alert Trigger
+  useEffect(() => {
+    if (!user?.uid || !minute || !today || trackers.length === 0) return;
+    for (const tracker of trackers) {
+      const schedules =
+        Array.isArray(tracker.dose_schedules) && tracker.dose_schedules.length > 0
+          ? tracker.dose_schedules
+          : [{ time: tracker.reminder_time.slice(0, 5), meal: tracker.meal_timing || "After meal" }];
+
+      const matchesMinute = schedules.some((s) => s.time.slice(0, 5) === minute);
+      if (
+        tracker.reminder_enabled &&
+        matchesMinute &&
+        !logs.some((log) => log.tracker_id === tracker.id && log.dose_date === today)
+      ) {
+        notifyOnce(
+          `dose-${tracker.id}-${today}-${minute}`,
+          `Time for ${tracker.product_name}`,
+          `Your ${tracker.daily_dose} unit daily dose is ready.`
+        );
+      }
+      if (isLowOnStock(tracker)) {
+        notifyOnce(
+          `stock-${tracker.id}-${today}`,
+          `${tracker.product_name} is running low`,
+          `About ${daysRemaining(tracker)} days left. Reorder on Man Matters soon.`
+        );
+      }
+    }
+  }, [user?.uid, minute, today, trackers, logs, notifications]);
+
+  const dosesToday = useMemo(
+    () =>
+      trackers.filter((tracker) =>
+        logs.some((log) => log.tracker_id === tracker.id && log.dose_date === today)
+      ).length,
+    [trackers, logs, today]
+  );
+
+  const streak = useMemo(() => {
+    let count = 0;
+    for (let offset = 0; offset < 7; offset += 1) {
+      const date = new Date();
+      date.setDate(date.getDate() - offset);
+      const key = localDateKey(date);
+      if (
+        trackers.length > 0 &&
+        trackers.every((tracker) =>
+          logs.some((log) => log.tracker_id === tracker.id && log.dose_date === key)
+        )
+      ) {
+        count += 1;
+      } else {
+        if (offset === 0) continue;
+        break;
+      }
+    }
+    return count;
+  }, [trackers, logs]);
+
+  const totalGummiesConsumed = useMemo(() => {
+    const loggedSum = logs.reduce((acc, log) => acc + (log.gummies_taken || 1), 0);
+    return Math.max(loggedSum, 14);
+  }, [logs]);
+
+  const currentJourneyDay = useMemo(() => {
+    if (checkups.length === 0) return 1;
+    const earliest = [...checkups].sort((a, b) => a.dayNumber - b.dayNumber)[0];
+    const start = new Date(`${earliest.date}T12:00:00`);
+    const now = new Date();
+    const diffDays = Math.max(1, Math.round((now - start) / 86_400_000) + earliest.dayNumber);
+    return diffDays;
+  }, [checkups]);
+
+  function startUserSession(userEmail) {
+    const normalized = userEmail.trim().toLowerCase() || "guest@dosemate.app";
+    setUser({
+      uid: normalized,
+      email: normalized,
+    });
+  }
+
+  async function submitAuth(event) {
+    event.preventDefault();
+    setAuthBusy(true);
+    const trimmedEmail = email.trim() || "arjun@dosemate.app";
+    startUserSession(trimmedEmail);
+    showToast(
+      authMode === "signup"
+        ? "Account created! Complete your quick health profile."
+        : "Welcome back to Dosemate."
+    );
+    setAuthBusy(false);
+  }
+
+  async function signInWithGoogle() {
+    setAuthBusy(true);
+    startUserSession("arjun.google@dosemate.app");
+    showToast("Signed in with Google!");
+    setAuthBusy(false);
+  }
+
+  async function signInAsGuest() {
+    setAuthBusy(true);
+    startUserSession("guest@dosemate.app");
+    showToast("Signed in as Guest. Personalize your routine below!");
+    setAuthBusy(false);
+  }
+
+  async function signOut() {
+    setUser(null);
+    setHealthProfile(null);
+    setTrackers([]);
+    setLogs([]);
+    setCheckups([]);
+    setEditingProfile(false);
+    showToast("You’re signed out.", "info");
+  }
+
+  async function handleCompleteOnboarding(profileData) {
+    if (!user?.uid) return;
+
+    let nextTrackers = trackers;
+    if (trackers.length === 0 && Array.isArray(profileData.selectedProducts)) {
+      const nowIso = new Date().toISOString();
+      nextTrackers = profileData.selectedProducts.map((prodName, i) => {
+        const preset = MAN_MATTERS_GUMMY_PRESETS.find(
+          (p) => p.name.toLowerCase() === prodName.toLowerCase()
+        );
+
+        const dailyDose = preset ? preset.defaultDose : 1;
+        const baseTime = profileData.preferredReminder || "09:00";
+        const schedules = Array.from({ length: dailyDose }, (_, idx) => ({
+          time:
+            preset?.defaultTimes?.[idx] ||
+            (idx === 0 ? baseTime : idx === 1 ? "21:00" : "14:00"),
+          meal: preset?.defaultMeal || "After meal",
+        }));
+
+        return {
+          id: `tracker-${Date.now()}-${i}`,
+          user_id: user.uid,
+          product_name: prodName,
+          gummies_remaining: preset ? preset.defaultStock : 30,
+          daily_dose: dailyDose,
+          reminder_time: schedules[0].time,
+          meal_timing: schedules[0].meal,
+          dose_schedules: schedules,
+          reorder_threshold: 7,
+          reorder_url: preset?.reorderUrl || "https://man.matters",
+          reminder_enabled: true,
+          created_at: nowIso,
+        };
+      });
+      setTrackers(nextTrackers);
+      saveStoredData(user.uid, "trackers", nextTrackers);
+    }
+
+    setHealthProfile(profileData);
+    saveStoredData(user.uid, "profile", profileData);
+    setEditingProfile(false);
+    setActiveTab("routine");
+    showToast("Your personalized Dosemate regimen is ready!");
+  }
+
+  async function handleUpdateAvatar(newAvatarUrl) {
+    if (!user?.uid || !healthProfile) return;
+    const updatedProfile = { ...healthProfile, avatarUrl: newAvatarUrl };
+    setHealthProfile(updatedProfile);
+    saveStoredData(user.uid, "profile", updatedProfile);
+
+    showToast(
+      newAvatarUrl ? "Profile picture updated!" : "Profile picture reset to default.",
+      "success"
+    );
+  }
+
+  function notifyOnce(key, title, body) {
+    if (notifications !== "granted") return;
+    const storageKey = `${user?.uid}:${key}`;
+    if (sentNotificationsRef.current.has(storageKey)) return;
+    new Notification(title, { body });
+    sentNotificationsRef.current.add(storageKey);
+  }
+
+  async function enableNotifications() {
+    if (!("Notification" in window)) {
+      setNotifications("unsupported");
+      showToast("Browser notifications aren't supported in this browser.", "info");
+      return;
+    }
+    if (window.top !== window.self) {
+      showToast("Reminders are active in-app! Open in a full tab for OS-level alerts.", "info");
+      return;
+    }
+    const permission = await Notification.requestPermission();
+    setNotifications(permission);
+    if (permission === "granted") {
+      showToast("Alerts are on while Dosemate is open.");
+    } else {
+      showToast("Allow notifications in your browser settings.", "info");
+    }
+  }
+
+  function openAddDialog(tracker) {
+    setEditing(tracker ?? null);
+    if (tracker) {
+      const matchedPreset = MAN_MATTERS_GUMMY_PRESETS.find(
+        (preset) => preset.name.toLowerCase() === tracker.product_name.toLowerCase()
+      );
+      const doseCount = Math.max(1, Number(tracker.daily_dose) || 1);
+      const existingSchedules =
+        Array.isArray(tracker.dose_schedules) && tracker.dose_schedules.length > 0
+          ? tracker.dose_schedules
+          : Array.from({ length: doseCount }, (_, idx) => ({
+              time: idx === 0 ? tracker.reminder_time.slice(0, 5) : "21:00",
+              meal: tracker.meal_timing || "After meal",
+            }));
+
+      setForm({
+        product_name: tracker.product_name,
+        is_custom_product: !matchedPreset,
+        gummies_remaining: tracker.gummies_remaining,
+        daily_dose: doseCount,
+        reminder_time: tracker.reminder_time.slice(0, 5),
+        meal_timing: tracker.meal_timing || "After meal",
+        dose_schedules: existingSchedules,
+        reorder_threshold: tracker.reorder_threshold,
+        reorder_url: tracker.reorder_url ?? "",
+        reminder_enabled: tracker.reminder_enabled,
+      });
+    } else {
+      setForm(emptyForm);
+    }
+    setDialogOpen(true);
+  }
+
+  function handleSelectProductPreset(selectedValue) {
+    if (selectedValue === "__custom__") {
+      setForm((prev) => ({
+        ...prev,
+        is_custom_product: true,
+        product_name: "",
+        reorder_url: "https://man.matters",
+      }));
+      return;
+    }
+
+    const preset = MAN_MATTERS_GUMMY_PRESETS.find((item) => item.name === selectedValue);
+    if (!preset) return;
+
+    const nextSchedules = Array.from({ length: preset.defaultDose }, (_, idx) => ({
+      time: preset.defaultTimes[idx] || (idx === 0 ? "09:00" : idx === 1 ? "21:00" : "14:00"),
+      meal: preset.defaultMeal,
+    }));
+
+    setForm((prev) => ({
+      ...prev,
+      is_custom_product: false,
+      product_name: preset.name,
+      gummies_remaining: preset.defaultStock || 30,
+      daily_dose: preset.defaultDose,
+      reminder_time: nextSchedules[0].time,
+      meal_timing: preset.defaultMeal,
+      dose_schedules: nextSchedules,
+      reorder_url: preset.reorderUrl,
+    }));
+  }
+
+  function handleDailyDoseChange(rawCount) {
+    const count = Math.max(1, Math.min(10, Number(rawCount) || 1));
+    setForm((prev) => {
+      const currentSchedules = Array.isArray(prev.dose_schedules) ? prev.dose_schedules : [];
+      const defaultTimes = ["09:00", "21:00", "14:00", "18:00"];
+      const nextSchedules = Array.from({ length: count }, (_, idx) => {
+        if (currentSchedules[idx]) return currentSchedules[idx];
+        return {
+          time: idx === 0 ? prev.reminder_time || "09:00" : defaultTimes[idx % defaultTimes.length],
+          meal: prev.meal_timing || "After meal",
+        };
+      });
+      return {
+        ...prev,
+        daily_dose: count,
+        reminder_time: nextSchedules[0]?.time || prev.reminder_time,
+        meal_timing: nextSchedules[0]?.meal || prev.meal_timing,
+        dose_schedules: nextSchedules,
+      };
+    });
+  }
+
+  function updateDoseScheduleItem(index, field, value) {
+    setForm((prev) => {
+      const updated = prev.dose_schedules.map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item
+      );
+      return {
+        ...prev,
+        dose_schedules: updated,
+        reminder_time: updated[0]?.time || prev.reminder_time,
+        meal_timing: updated[0]?.meal || prev.meal_timing,
+      };
+    });
+  }
+
+  async function saveTracker(event) {
+    event.preventDefault();
+    if (!user?.uid) return;
+    if (!form.product_name.trim()) {
+      showToast("Please select a product or enter a custom name.", "error");
+      return;
+    }
+    setSaving(true);
+
+    const normalizedSchedules = Array.from({ length: form.daily_dose }, (_, idx) => ({
+      time: form.dose_schedules[idx]?.time || form.reminder_time || "09:00",
+      meal: form.dose_schedules[idx]?.meal || form.meal_timing || "After meal",
+    }));
+
+    const values = {
+      product_name: form.product_name.trim(),
+      gummies_remaining: Number(form.gummies_remaining),
+      daily_dose: Number(form.daily_dose),
+      reorder_threshold: Number(form.reorder_threshold),
+      reorder_url: form.reorder_url?.trim() || null,
+      reminder_time: normalizedSchedules[0].time,
+      meal_timing: normalizedSchedules[0].meal,
+      dose_schedules: normalizedSchedules,
+      reminder_enabled: Boolean(form.reminder_enabled),
+    };
+
+    let nextTrackers;
+    if (editing) {
+      nextTrackers = trackers.map((t) => (t.id === editing.id ? { ...t, ...values } : t));
+      showToast("Product routine updated.");
+    } else {
+      const newId = `tracker-${Date.now()}`;
+      nextTrackers = [
+        ...trackers,
+        { id: newId, ...values, user_id: user.uid, created_at: new Date().toISOString() },
+      ];
+      showToast("Product added to your routine.");
+    }
+
+    setTrackers(nextTrackers);
+    saveStoredData(user.uid, "trackers", nextTrackers);
+    setDialogOpen(false);
+    setSaving(false);
+  }
+
+  async function logDose(tracker) {
+    if (!user?.uid || !today) return;
+    const existingLog = logs.find(
+      (log) => log.tracker_id === tracker.id && log.dose_date === today
+    );
+
+    setWorkingId(tracker.id);
+
+    if (existingLog) {
+      const nextLogs = logs.filter((l) => l.id !== existingLog.id);
+      const nextTrackers = trackers.map((t) =>
+        t.id === tracker.id
+          ? { ...t, gummies_remaining: t.gummies_remaining + t.daily_dose }
+          : t
+      );
+      setLogs(nextLogs);
+      setTrackers(nextTrackers);
+      saveStoredData(user.uid, "logs", nextLogs);
+      saveStoredData(user.uid, "trackers", nextTrackers);
+      showToast("Dose check-off undone.", "info");
+    } else {
+      if (tracker.gummies_remaining < tracker.daily_dose) {
+        showToast(
+          "Not enough units left for a full dose. Update your bottle count first.",
+          "error"
+        );
+        setWorkingId(null);
+        return;
+      }
+      const logId = `log-${tracker.id}-${today}`;
+      const nextLogs = [
+        {
+          id: logId,
+          tracker_id: tracker.id,
+          user_id: user.uid,
+          dose_date: today,
+          gummies_taken: tracker.daily_dose,
+          created_at: new Date().toISOString(),
+        },
+        ...logs,
+      ];
+      const nextTrackers = trackers.map((t) =>
+        t.id === tracker.id
+          ? { ...t, gummies_remaining: Math.max(0, t.gummies_remaining - t.daily_dose) }
+          : t
+      );
+      setLogs(nextLogs);
+      setTrackers(nextTrackers);
+      saveStoredData(user.uid, "logs", nextLogs);
+      saveStoredData(user.uid, "trackers", nextTrackers);
+      showToast("Dose checked off. Keep your streak alive!");
+    }
+
+    setWorkingId(null);
+  }
+
+  async function deleteTracker(tracker) {
+    if (!user?.uid) return;
+    const nextTrackers = trackers.filter((t) => t.id !== tracker.id);
+    const nextLogs = logs.filter((l) => l.tracker_id !== tracker.id);
+    setTrackers(nextTrackers);
+    setLogs(nextLogs);
+    saveStoredData(user.uid, "trackers", nextTrackers);
+    saveStoredData(user.uid, "logs", nextLogs);
+    setDialogOpen(false);
+    showToast("Product removed from routine.", "info");
+  }
+
+  async function handleAddCheckup(newEntry) {
+    if (!user?.uid) return;
+    const nextCheckups = [newEntry, ...checkups];
+    setCheckups(nextCheckups);
+    saveStoredData(user.uid, "checkups", nextCheckups);
+    showToast(`Day ${newEntry.dayNumber} checkup saved!`);
+  }
+
+  async function handleDeleteCheckup(id) {
+    if (!user?.uid) return;
+    const nextCheckups = checkups.filter((item) => item.id !== id);
+    setCheckups(nextCheckups);
+    saveStoredData(user.uid, "checkups", nextCheckups);
+    showToast("Checkup entry removed.", "info");
+  }
+
+  if (!user) {
+    return (
+      <WebAppShell toasts={toasts}>
+        <SignInScreen
+          authMode={authMode}
+          setAuthMode={setAuthMode}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          authBusy={authBusy}
+          submitAuth={submitAuth}
+          signInWithGoogle={signInWithGoogle}
+          signInAsGuest={signInAsGuest}
+        />
+      </WebAppShell>
+    );
+  }
+
+  const displayName =
+    healthProfile?.fullName ||
+    (user.email ? user.email.split("@")[0] : "Guest Member");
+
+  const avatarUrl = healthProfile?.avatarUrl || "";
+  const lowTrackers = trackers.filter(isLowOnStock);
+  const expectedDoses = trackers.length;
+
+  return (
+    <WebAppShell toasts={toasts}>
+      {/* Sticky Top Brand & Utility Bar */}
+      <header className="sticky top-0 z-30 border-b border-[#DCE5DF] bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          {/* Brand Logo -> Navigates back to Routine Home */}
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProfile(false);
+              setActiveTab("routine");
+            }}
+            className="inline-flex cursor-pointer items-center gap-2.5 text-left transition hover:opacity-80"
+            aria-label="Dosemate home — go to Routine"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#388E6C] text-white shadow-2xs sm:h-9 sm:w-9">
+              <ShieldCheck size={18} strokeWidth={2.3} />
+            </span>
+            <span className="flex flex-col leading-none">
+              <span className="text-base font-extrabold tracking-tight text-[#1A2B24] sm:text-lg">
+                Dose<span className="font-normal text-[#566B62]">mate</span>
+              </span>
+              <span className="mt-0.5 text-[9px] font-bold tracking-wider text-[#388E6C] uppercase sm:text-[10px]">
+                Powered by Man Matters
+              </span>
+            </span>
+          </button>
+
+          {/* Top Bar Right Utility Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {healthProfile && (
+              <button
+                type="button"
+                onClick={() => setEditingProfile((prev) => !prev)}
+                title="Edit Health Profile"
+                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-2.5 text-xs font-semibold text-[#1A2B24] transition hover:bg-[#F4F7F5] sm:h-9 sm:px-3"
+              >
+                <HeartPulse size={14} className="text-[#388E6C]" />
+                <span className="hidden sm:inline">Health Profile</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => void enableNotifications()}
+              aria-label="Enable notifications"
+              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#DCE5DF] bg-white px-2.5 text-xs font-semibold text-[#1A2B24] transition hover:bg-[#F4F7F5] sm:h-9 sm:px-3"
+            >
+              <Bell
+                size={14}
+                className={notifications === "granted" ? "text-[#388E6C]" : ""}
+              />
+              <span className="hidden sm:inline">
+                {notifications === "granted" ? "Alerts on" : "Alerts"}
+              </span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area: Onboarding Wizard OR Active Dashboard Tabs */}
+      <main className="flex-1 pb-32">
+        {!healthProfile || editingProfile ? (
+          <HealthOnboardingWizard
+            userEmail={user.email}
+            existingProfile={healthProfile}
+            onComplete={handleCompleteOnboarding}
+            onSkip={editingProfile ? () => setEditingProfile(false) : null}
+          />
+        ) : activeTab === "progress" ? (
+          <HairCheckupPage
+            today={today}
+            currentJourneyDay={currentJourneyDay}
+            primaryGummyName={trackers[0]?.product_name || "Biotin Hair Gummies"}
+            totalGummiesConsumed={totalGummiesConsumed}
+            checkups={checkups}
+            onAddCheckup={handleAddCheckup}
+            onDeleteCheckup={handleDeleteCheckup}
+            showToast={showToast}
+          />
+        ) : activeTab === "products" ? (
+          <ProductsCatalogPage />
+        ) : activeTab === "profile" ? (
+          <UserProfilePage
+            user={user}
+            healthProfile={healthProfile}
+            displayName={displayName}
+            streak={streak}
+            currentJourneyDay={currentJourneyDay}
+            totalGummiesConsumed={totalGummiesConsumed}
+            onUpdateAvatar={handleUpdateAvatar}
+            onEditHealthProfile={() => setEditingProfile(true)}
+            onSignOut={signOut}
+            showToast={showToast}
+          />
+        ) : (
+          <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+            {/* Personalized Welcome Header & Primary Add Products CTA */}
+            <section className="flex flex-col justify-between gap-4 border-b border-[#DCE5DF] pb-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#566B62]">
+                  <span className="inline-flex text-[#F5B841]">
+                    <Sun size={14} />
+                  </span>
+                  {healthProfile.goalHorizon} Goal · {healthProfile.concerns?.[0] || "Daily Wellness"}
+                </p>
+                <h1 className="mt-1.5 text-2xl font-extrabold text-[#1A2B24] sm:text-3xl">
+                  Hey {displayName.split(" ")[0]}, keep your daily ritual going
+                </h1>
+                <p className="mt-1 text-sm text-[#5E736A]">
+                  Track each dose, monitor bottle supply, and stay consistent with your regimen.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => openAddDialog()}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#388E6C] px-5 py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] active:scale-[0.98]"
+              >
+                <Plus size={16} />
+                <span>Add Product</span>
+              </button>
+            </section>
+
+            {/* 3-Card Summary Metrics Strip */}
+            <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#E3F2EC] text-[#388E6C]">
+                  <CircleCheck size={20} />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                    TODAY&apos;S PROGRESS
+                  </p>
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                    {dosesToday}
+                    <span className="text-sm font-medium text-[#667B72]">
+                      {" "}
+                      / {expectedDoses} done
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FDF2D8] text-[#B87D14]">
+                  <Sparkles size={20} />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                    CURRENT STREAK
+                  </p>
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                    {streak}
+                    <span className="text-sm font-medium text-[#667B72]">
+                      {" "}
+                      {streak === 1 ? "day" : "days"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3.5 rounded-2xl border border-[#DCE5DF] bg-white p-4 shadow-2xs">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FCECE8] text-[#C94F32]">
+                  <PackageCheck size={20} />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                    BOTTLE SUPPLY
+                  </p>
+                  <p className="mt-0.5 text-xl font-extrabold text-[#1A2B24]">
+                    {lowTrackers.length
+                      ? `${lowTrackers.length} running low`
+                      : "All well stocked"}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Low-Stock Alert Banner */}
+            {lowTrackers.length > 0 && (
+              <section className="flex items-center justify-between gap-4 rounded-2xl border border-[#F5D6CE] bg-[#FDF6F4] p-4 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE5DF] text-[#C94F32]">
+                    <PackageCheck size={20} />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-[#9C331C]">
+                      Low supply alert — reorder soon
+                    </p>
+                    <p className="mt-0.5 text-xs text-[#6B4A43]">
+                      {lowTrackers
+                        .map(
+                          (tracker) =>
+                            `${tracker.product_name} (${daysRemaining(tracker)} ${
+                              daysRemaining(tracker) === 1 ? "day" : "days"
+                            } left)`
+                        )
+                        .join(" · ")}
+                    </p>
+                  </div>
+                </div>
+                <span className="hidden text-[#C94F32] sm:inline">
+                  <ArrowDown size={16} />
+                </span>
+              </section>
+            )}
+
+            {/* Main 2-Column Web Dashboard Layout */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              {/* Left 8 Columns: Active Product Routine Cards */}
+              <section className="space-y-4 lg:col-span-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                      THE DAILY DOSE
+                    </p>
+                    <h2 className="text-lg font-bold text-[#1A2B24]">Active Regimen</h2>
+                  </div>
+                  <span className="rounded-full bg-[#E3F2EC] px-3 py-1 text-xs font-bold text-[#276B50]">
+                    {trackers.length.toString().padStart(2, "0")}{" "}
+                    {trackers.length === 1 ? "PRODUCT" : "PRODUCTS"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {trackers.map((tracker, index) => {
+                    const taken = logs.some(
+                      (log) => log.tracker_id === tracker.id && log.dose_date === today
+                    );
+                    const days = daysRemaining(tracker);
+                    const low = isLowOnStock(tracker);
+                    const fill = Math.min(
+                      100,
+                      (tracker.gummies_remaining /
+                        Math.max(tracker.gummies_remaining + tracker.daily_dose * 10, 1)) *
+                        100
+                    );
+
+                    return (
+                      <article
+                        key={tracker.id}
+                        className={`flex flex-col justify-between rounded-3xl border p-5 transition ${
+                          taken
+                            ? "border-[#BFE3D3] bg-[#F1F9F5]"
+                            : "border-[#DCE5DF] bg-white shadow-2xs hover:border-[#388E6C]/50"
+                        }`}
+                      >
+                        <div>
+                          {/* Card Header */}
+                          <div className="flex items-start justify-between gap-2.5">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold ${
+                                  taken
+                                    ? "bg-[#388E6C] text-white"
+                                    : "border border-[#DCE5DF] bg-[#F4F7F5] text-[#485C53]"
+                                }`}
+                              >
+                                {taken ? (
+                                  <Check size={16} />
+                                ) : (
+                                  (index + 1).toString().padStart(2, "0")
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[10px] font-bold tracking-wider text-[#667B72]">
+                                  {tracker.reminder_enabled ? "DAILY REGIMEN" : "ROUTINE"}
+                                </span>
+                                <h3 className="text-sm font-bold text-[#1A2B24]">
+                                  {tracker.product_name}
+                                </h3>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => openAddDialog(tracker)}
+                              aria-label={`Edit ${tracker.product_name}`}
+                              title="Edit routine"
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[#72877E] transition hover:bg-[#EAEFEA] hover:text-[#1A2B24]"
+                            >
+                              <Settings2 size={16} />
+                            </button>
+                          </div>
+
+                          {/* Dosage & Meal Schedule Badges */}
+                          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#5E736A]">
+                            <span className="inline-flex items-center gap-1 font-semibold text-[#3E4C59]">
+                              <Clock3 size={13} />
+                              {tracker.daily_dose}{" "}
+                              {tracker.daily_dose === 1 ? "unit/day" : "units/day"}
+                            </span>
+                            {Array.isArray(tracker.dose_schedules) &&
+                            tracker.dose_schedules.length > 0 ? (
+                              tracker.dose_schedules.map((sched, sIdx) => (
+                                <span
+                                  key={sIdx}
+                                  className="rounded-lg bg-[#E3F2EC] px-2 py-0.5 text-[11px] font-semibold text-[#276B50]"
+                                >
+                                  #{sIdx + 1} · {sched.time.slice(0, 5)} ({sched.meal})
+                                </span>
+                              ))
+                            ) : (
+                              <span className="rounded-lg bg-[#E3F2EC] px-2 py-0.5 text-[11px] font-semibold text-[#276B50]">
+                                {tracker.reminder_time.slice(0, 5)} (
+                                {tracker.meal_timing || "After meal"})
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Bottle Supply Progress Bar */}
+                          <div className="mt-4">
+                            <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold">
+                              <span className="text-[#667B72]">
+                                {tracker.gummies_remaining} units left in bottle
+                              </span>
+                              <span className={low ? "text-[#C94F32]" : "text-[#388E6C]"}>
+                                {days} {days === 1 ? "day" : "days"} left
+                              </span>
+                            </div>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-[#E6ECE9]">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  low ? "bg-[#E86F52]" : "bg-[#388E6C]"
+                                }`}
+                                style={{ width: `${fill}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Footer */}
+                        <div className="mt-4 flex items-center gap-2 border-t border-[#EAEFEA] pt-3.5">
+                          <button
+                            type="button"
+                            onClick={() => void logDose(tracker)}
+                            disabled={workingId === tracker.id}
+                            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition active:scale-[0.98] ${
+                              taken
+                                ? "border border-[#B6DEC9] bg-[#DCF2E7] text-[#22664B] hover:bg-[#CFEAD9]"
+                                : "bg-[#388E6C] text-white shadow-2xs hover:bg-[#2E775A]"
+                            }`}
+                          >
+                            <Check size={15} />
+                            {workingId === tracker.id
+                              ? "Saving…"
+                              : taken
+                              ? "Taken today (Undo)"
+                              : "Take dose"}
+                          </button>
+
+                          {tracker.reorder_url && low && (
+                            <a
+                              href={tracker.reorder_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white px-3.5 py-2.5 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                            >
+                              Reorder <ArrowUpRight size={14} />
+                            </a>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Right 4 Columns: Weekly Consistency & Health Summary Sidebar */}
+              <aside className="space-y-4 lg:col-span-4">
+                {/* 7-Day Consistency Calendar */}
+                <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold tracking-wider text-[#667B72]">
+                        CONSISTENCY
+                      </p>
+                      <h2 className="text-base font-bold text-[#1A2B24]">Last 7 Days</h2>
+                    </div>
+                    <span className="rounded-full bg-[#E3F2EC] px-2.5 py-1 text-xs font-bold text-[#276B50]">
+                      {
+                        logs.filter((log) =>
+                          trackers.some((tracker) => tracker.id === log.tracker_id)
+                        ).length
+                      }{" "}
+                      doses
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1.5 text-center">
+                    {Array.from({ length: 7 }, (_, offset) => {
+                      const date = new Date();
+                      date.setDate(date.getDate() - (6 - offset));
+                      const key = localDateKey(date);
+                      const complete =
+                        trackers.length > 0 &&
+                        trackers.every((tracker) =>
+                          logs.some(
+                            (log) => log.tracker_id === tracker.id && log.dose_date === key
+                          )
+                        );
+                      const partial = logs.some(
+                        (log) =>
+                          log.dose_date === key &&
+                          trackers.some((tracker) => tracker.id === log.tracker_id)
+                      );
+
+                      return (
+                        <div key={key} className="flex flex-col items-center gap-1.5">
+                          <span className="text-[10px] font-bold text-[#72877E]">
+                            {new Intl.DateTimeFormat("en", { weekday: "narrow" }).format(date)}
+                          </span>
+                          <span
+                            className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition ${
+                              complete
+                                ? "bg-[#388E6C] text-white shadow-2xs"
+                                : partial
+                                ? "border border-[#388E6C] bg-[#E3F2EC] text-[#276B50]"
+                                : "border border-[#E1E6EB] bg-[#F9FBFA] text-[#566B62]"
+                            }`}
+                          >
+                            {complete ? (
+                              <Check size={14} />
+                            ) : partial ? (
+                              <span className="h-2 w-2 rounded-full bg-[#388E6C]" />
+                            ) : (
+                              <span>{date.getDate()}</span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* User Health Profile Snapshot Card */}
+                <div className="rounded-3xl border border-[#DCE5DF] bg-white p-5 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold tracking-wider text-[#388E6C]">
+                      YOUR HEALTH PROFILE
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setEditingProfile(true)}
+                      className="text-xs font-bold text-[#5E736A] underline hover:text-[#1A2B24]"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                  <p className="mt-1.5 text-sm font-bold text-[#1A2B24]">
+                    {healthProfile.hairStage}
+                  </p>
+                  <p className="mt-1 text-xs text-[#5E736A]">
+                    Age {healthProfile.age} · Sleep {healthProfile.sleepHours} ·{" "}
+                    {healthProfile.stressLevel} stress
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {(healthProfile.concerns || []).map((c) => (
+                      <span
+                        key={c}
+                        className="rounded-lg bg-[#F4F7F5] px-2.5 py-1 text-[10px] font-bold text-[#3E4C59]"
+                      >
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Ask Queries Floating Specialist Chatbot */}
+      <SahilAIChatbot
+        healthProfile={healthProfile}
+        trackers={trackers}
+        streak={streak}
+        currentJourneyDay={currentJourneyDay}
+      />
+
+      {/* Bottom Docked Navigation Bar (Routine · Progress · Products · Profile) */}
+      {healthProfile && !editingProfile && (
+        <nav
+          aria-label="Bottom page navigation"
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[#DCE5DF] bg-white/95 px-4 py-2.5 shadow-[0_-4px_20px_rgba(22,58,46,0.06)] backdrop-blur-md"
+        >
+          <div className="mx-auto grid max-w-lg grid-cols-4 gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab("routine")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
+                activeTab === "routine"
+                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
+                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+              }`}
+            >
+              <Pill size={17} />
+              <span>Routine</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("progress")}
+              className={`relative flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
+                activeTab === "progress"
+                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
+                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+              }`}
+            >
+              <Camera size={17} />
+              <span>Progress</span>
+              {!checkups.some((c) => c.date === today) && (
+                <span className="absolute top-2 right-5 h-2 w-2 rounded-full bg-[#E86F52]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("products")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
+                activeTab === "products"
+                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
+                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+              }`}
+            >
+              <ShoppingBag size={17} />
+              <span>Products</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("profile")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-bold transition ${
+                activeTab === "profile"
+                  ? "bg-[#E3F2EC] text-[#388E6C] shadow-2xs"
+                  : "text-[#5E736A] hover:bg-[#F4F7F5] hover:text-[#1A2B24]"
+              }`}
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  className="h-[18px] w-[18px] rounded-full object-cover ring-1 ring-[#388E6C]"
+                />
+              ) : (
+                <User size={17} />
+              )}
+              <span>Profile</span>
+            </button>
+          </div>
+        </nav>
+      )}
+
+      {/* Centered Responsive Web Modal Dialog for Adding / Editing Products */}
+      {dialogOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A2B24]/55 p-4 backdrop-blur-[2px]"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#DCE5DF] bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E3F2EC] text-[#388E6C]">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[#1A2B24]">
+                    {editing ? "Edit product routine" : "Add product to routine"}
+                  </h2>
+                  <p className="text-xs text-[#5E736A]">
+                    Select a supplement or add your own with custom meal timings.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDialogOpen(false)}
+                aria-label="Close modal"
+                className="rounded-full p-1.5 text-[#72877E] hover:bg-[#F4F7F5]"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form className="mt-5 space-y-4" onSubmit={(event) => void saveTracker(event)}>
+              <div>
+                <label
+                  htmlFor="product-select"
+                  className="block text-xs font-bold text-[#3E4C59]"
+                >
+                  Select Product
+                </label>
+                <select
+                  id="product-select"
+                  value={form.is_custom_product ? "__custom__" : form.product_name}
+                  onChange={(event) => handleSelectProductPreset(event.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs font-semibold text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                >
+                  {MAN_MATTERS_GUMMY_PRESETS.map((preset) => (
+                    <option key={preset.name} value={preset.name}>
+                      {preset.name}
+                    </option>
+                  ))}
+                  <option value="__custom__">+ Add your own</option>
+                </select>
+
+                {form.is_custom_product && (
+                  <div className="mt-2.5">
+                    <label
+                      htmlFor="custom-product-name"
+                      className="block text-[11px] font-bold text-[#5E736A]"
+                    >
+                      Custom product name
+                    </label>
+                    <input
+                      id="custom-product-name"
+                      autoFocus
+                      maxLength={80}
+                      required
+                      value={form.product_name}
+                      onChange={(event) =>
+                        setForm({ ...form, product_name: event.target.value })
+                      }
+                      placeholder="e.g. Redensyl Hair Tonic or Multivitamin"
+                      className="mt-1 w-full rounded-xl border border-[#388E6C] bg-white px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="stock-count"
+                    className="block text-xs font-bold text-[#3E4C59]"
+                  >
+                    Units in bottle
+                  </label>
+                  <input
+                    id="stock-count"
+                    type="number"
+                    min={0}
+                    max={10000}
+                    required
+                    value={form.gummies_remaining}
+                    onChange={(event) =>
+                      setForm({ ...form, gummies_remaining: Number(event.target.value) })
+                    }
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="daily-dose"
+                    className="block text-xs font-bold text-[#3E4C59]"
+                  >
+                    Units per day
+                  </label>
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    {[1, 2, 3, 4].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => handleDailyDoseChange(num)}
+                        className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${
+                          form.daily_dose === num
+                            ? "bg-[#388E6C] text-white shadow-2xs"
+                            : "border border-[#D5DCE4] bg-[#F7F8FA] text-[#485C53] hover:bg-[#EAEFEA]"
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                    <input
+                      id="daily-dose"
+                      type="number"
+                      min={1}
+                      max={10}
+                      required
+                      aria-label="Custom daily dose"
+                      value={form.daily_dose}
+                      onChange={(event) => handleDailyDoseChange(event.target.value)}
+                      className="w-12 rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-1.5 py-2.5 text-center text-xs font-bold text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Single Dose vs Separate Per-Dose Timings & Before/After Meal Selection */}
+              {form.daily_dose === 1 ? (
+                <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="reminder-time"
+                      className="block text-xs font-bold text-[#3E4C59]"
+                    >
+                      Reminder time
+                    </label>
+                    <input
+                      id="reminder-time"
+                      type="time"
+                      required
+                      value={form.dose_schedules[0]?.time || form.reminder_time}
+                      onChange={(event) =>
+                        updateDoseScheduleItem(0, "time", event.target.value)
+                      }
+                      className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                    />
+                  </div>
+
+                  <div>
+                    <span className="block text-xs font-bold text-[#3E4C59]">Meal timing</span>
+                    <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                      {["Before meal", "After meal"].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => updateDoseScheduleItem(0, "meal", option)}
+                          className={`rounded-xl py-2.5 text-[11px] font-bold transition ${
+                            (form.dose_schedules[0]?.meal || form.meal_timing) === option
+                              ? "bg-[#388E6C] text-white shadow-2xs"
+                              : "border border-[#D5DCE4] bg-[#F7F8FA] text-[#485C53] hover:bg-[#EAEFEA]"
+                          }`}
+                        >
+                          {option === "Before meal" ? "Before" : "After"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5 rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold tracking-wide text-[#276B50]">
+                      SEPARATE DOSE SCHEDULE ({form.daily_dose} UNITS)
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#667B72]">
+                      Time &amp; meal preference
+                    </span>
+                  </div>
+
+                  <div className="max-h-40 space-y-2 overflow-y-auto pr-0.5">
+                    {form.dose_schedules.map((sched, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 rounded-xl border border-[#E1E6EB] bg-white p-2"
+                      >
+                        <span className="w-16 shrink-0 text-[11px] font-bold text-[#3E4C59]">
+                          Dose #{idx + 1}
+                        </span>
+                        <input
+                          type="time"
+                          required
+                          aria-label={`Dose ${idx + 1} reminder time`}
+                          value={sched.time}
+                          onChange={(event) =>
+                            updateDoseScheduleItem(idx, "time", event.target.value)
+                          }
+                          className="w-24 rounded-lg border border-[#D5DCE4] bg-[#F7F8FA] px-2 py-1.5 text-[11px] font-semibold text-[#141A21] outline-none focus:border-[#388E6C]"
+                        />
+                        <div className="flex flex-1 gap-1">
+                          {["Before meal", "After meal"].map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              onClick={() => updateDoseScheduleItem(idx, "meal", option)}
+                              className={`flex-1 rounded-lg py-1.5 text-[10px] font-bold transition ${
+                                sched.meal === option
+                                  ? "bg-[#388E6C] text-white"
+                                  : "bg-[#F4F7F5] text-[#5E736A] hover:bg-[#EAEFEA]"
+                              }`}
+                            >
+                              {option === "Before meal" ? "Before" : "After"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="reorder-threshold"
+                    className="block text-xs font-bold text-[#3E4C59]"
+                  >
+                    Low-stock warning (days left)
+                  </label>
+                  <input
+                    id="reorder-threshold"
+                    type="number"
+                    min={0}
+                    max={365}
+                    required
+                    value={form.reorder_threshold}
+                    onChange={(event) =>
+                      setForm({ ...form, reorder_threshold: Number(event.target.value) })
+                    }
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reorder-url"
+                    className="block text-xs font-bold text-[#3E4C59]"
+                  >
+                    Reorder link
+                  </label>
+                  <input
+                    id="reorder-url"
+                    type="url"
+                    maxLength={2048}
+                    value={form.reorder_url ?? ""}
+                    onChange={(event) =>
+                      setForm({ ...form, reorder_url: event.target.value })
+                    }
+                    placeholder="https://man.matters"
+                    className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] bg-[#F7F8FA] px-3.5 py-2.5 text-xs text-[#141A21] outline-none transition focus:border-[#388E6C]"
+                  />
+                </div>
+              </div>
+
+              <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[#DCE5DF] bg-[#F9FBFA] p-3.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#FDF2D8] text-[#B87D14]">
+                  <Bell size={15} />
+                </span>
+                <span className="flex-1">
+                  <strong className="block text-xs font-bold text-[#1A2B24]">
+                    Enable daily reminders
+                  </strong>
+                  <small className="text-[11px] text-[#5E736A]">
+                    {form.dose_schedules.length > 1
+                      ? `${form.dose_schedules.length} reminders (${form.dose_schedules
+                          .map((s) => `${s.time} ${s.meal === "Before meal" ? "before" : "after"}`)
+                          .join(", ")})`
+                      : `At ${form.dose_schedules[0]?.time || form.reminder_time || "09:00"} (${
+                          form.dose_schedules[0]?.meal || form.meal_timing || "After meal"
+                        })`}
+                  </small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={form.reminder_enabled}
+                  onChange={(event) =>
+                    setForm({ ...form, reminder_enabled: event.target.checked })
+                  }
+                  aria-label="Enable daily reminder"
+                  className="h-4 w-4 accent-[#388E6C]"
+                />
+              </label>
+
+              <div className="flex items-center justify-end gap-2.5 border-t border-[#EAEFEA] pt-4">
+                {editing && (
+                  <button
+                    type="button"
+                    onClick={() => void deleteTracker(editing)}
+                    className="mr-auto inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] px-3.5 py-2.5 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                  >
+                    <X size={14} /> Remove
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setDialogOpen(false)}
+                  className="rounded-xl border border-[#DCE5DF] bg-white px-4 py-2.5 text-xs font-bold text-[#485C53] transition hover:bg-[#F4F7F5]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-xl bg-[#388E6C] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#2E775A] disabled:opacity-60"
+                >
+                  {saving ? "Saving…" : editing ? "Save changes" : "Add product"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </WebAppShell>
+  );
+}
+
+/* ── Mount ─────────────────────────────────────────────────── */
+const domRoot = ReactDOM.createRoot(document.getElementById("root"));
+domRoot.render(<React.StrictMode><App /></React.StrictMode>);
+  </script>
+</body>
+</html>
