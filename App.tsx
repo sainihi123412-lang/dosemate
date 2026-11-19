@@ -469,7 +469,7 @@ function SignInScreen({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="arjun@example.com"
+                placeholder="yourname@gmail.com"
                 className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-3 text-xs font-semibold text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599] dark:border-[#00E599] focus:bg-white dark:bg-[#131A16]"
               />
             </div>
@@ -485,7 +485,6 @@ function SignInScreen({
                 id="auth-password"
                 type="password"
                 required
-                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -2318,8 +2317,15 @@ export default function App() {
   async function submitAuth(event) {
     event.preventDefault();
     setAuthBusy(true);
-    const trimmedEmail = email.trim() || "arjun@dosemate.app";
-    startUserSession(trimmedEmail);
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail.endsWith("@gmail.com")) {
+      showToast("Email must end with @gmail.com", "error");
+      setAuthBusy(false);
+      return;
+    }
+
+    startUserSession(cleanEmail);
     showToast(
       authMode === "signup"
         ? "Account created! Complete your quick health profile."
