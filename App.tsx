@@ -558,7 +558,7 @@ function SignInScreen({
 /**
  * Post-Sign-In Health Profile & Onboarding Assessment Wizard (One Question at a Time)
  */
-function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip }) {
+function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip, onSignOut }) {
   const defaultName =
     existingProfile?.fullName ||
     (userEmail && !userEmail.includes("guest")
@@ -700,14 +700,25 @@ function HealthOnboardingWizard({ userEmail, existingProfile, onComplete, onSkip
               </span>
             </div>
 
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={() => void handleSkipNow()}
-              className="rounded-xl px-3 py-1.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] transition hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25] hover:text-[#1A2B24] dark:text-[#F1F5F3] disabled:opacity-50"
-            >
-              Skip for now →
-            </button>
+            <div className="flex items-center gap-2">
+              {onSignOut && (
+                <button
+                  type="button"
+                  onClick={onSignOut}
+                  className="rounded-xl px-2.5 py-1.5 text-xs font-semibold text-[#C53030] dark:text-[#FF8080] transition hover:bg-[#FFF5F5] dark:hover:bg-[#201515]"
+                >
+                  Log out
+                </button>
+              )}
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => void handleSkipNow()}
+                className="rounded-xl px-3 py-1.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] transition hover:bg-[#EAEFEA] dark:hover:bg-[#1E2C25] hover:text-[#1A2B24] dark:text-[#F1F5F3] disabled:opacity-50"
+              >
+                Skip for now →
+              </button>
+            </div>
           </div>
 
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#E4ECE7]">
@@ -2438,8 +2449,19 @@ export default function App() {
         showToast(err.message?.replace("Firebase: ", "") || "Google sign-in cancelled or failed.", "error");
       }
     } else {
-      startUserSession("arjun.google@dosemate.app");
-      showToast("Signed in with Google (Local Mode)!");
+      const entered = window.prompt("Enter your Google / Gmail account (must end with @gmail.com):");
+      if (!entered) {
+        setAuthBusy(false);
+        return;
+      }
+      const clean = entered.trim().toLowerCase();
+      if (!clean.endsWith("@gmail.com")) {
+        showToast("Email must end with @gmail.com", "error");
+        setAuthBusy(false);
+        return;
+      }
+      startUserSession(clean);
+      showToast(`Signed in with Google as ${clean}!`);
     }
     setAuthBusy(false);
   }
@@ -2904,6 +2926,17 @@ export default function App() {
                 {notifications === "granted" ? "Alerts on" : "Alerts"}
               </span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              title="Sign Out"
+              aria-label="Sign Out"
+              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#F5C2C7] dark:border-[#4A2024] bg-white dark:bg-[#131A16] px-2.5 text-xs font-semibold text-[#C53030] dark:text-[#FF8080] transition hover:bg-[#FFF5F5] dark:hover:bg-[#201515] sm:h-9 sm:px-3"
+            >
+              <LogOut size={13} />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
         </div>
       </header>
@@ -2916,6 +2949,7 @@ export default function App() {
             existingProfile={healthProfile}
             onComplete={handleCompleteOnboarding}
             onSkip={editingProfile ? () => setEditingProfile(false) : null}
+            onSignOut={signOut}
           />
         ) : activeTab === "progress" ? (
           <HairCheckupPage
