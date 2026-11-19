@@ -1718,8 +1718,8 @@ function UserProfilePage({
   const MAN_MATTERS_SOCIALS = [
     {
       name: "Instagram",
-      handle: "@manmatters.official",
-      url: "https://www.instagram.com/manmatters.official/",
+      handle: "@man.matters",
+      url: "https://www.instagram.com/man.matters/",
       bg: "#FCECE8",
       accent: "#B54434",
       icon: <Instagram size={18} />,
@@ -1734,8 +1734,8 @@ function UserProfilePage({
     },
     {
       name: "Official Website",
-      handle: "man.matters",
-      url: "https://man.matters",
+      handle: "manmatters.com",
+      url: "https://manmatters.com/home-alt?theme=reset&utm_source=google&utm_medium=brand&utm_campaign=Search_Brand_MM&utm_source=google_Search&utm_medium=180290939936&utm_campaign=753311585718&utm_term=man%20matters&gad_source=1&gad_campaignid=22580437328&gbraid=0AAAAA-2S6Ud-GmneGNC4Wl-VmRHwtAu8G&gclid=Cj0KCQiA2frXBhC_ARIsAPTFcdN00Zz_PXrFdt6IdPBdmuZ3M6aCGbczbeRyNnmAPuGjMe-nOPzQDeUaAkvgEALw_wcB",
       bg: "#E3F2EC",
       accent: "#276B50",
       icon: <Globe size={18} />,
