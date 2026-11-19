@@ -33,6 +33,8 @@ import {
   Upload,
   User,
   UserCheck,
+  Volume2,
+  VolumeX,
   X,
   Youtube,
 } from "lucide-react";
@@ -2179,6 +2181,36 @@ function SahilAIChatbot({
   );
 }
 
+// Melodic in-app alarm chime using Web Audio API (zero-dependency, works on mobile & desktop)
+function playAlarmChime() {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    if (ctx.state === "suspended") {
+      void ctx.resume();
+    }
+    // High-clarity 4-note ascending bell chime: C5, E5, G5, C6
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    const now = ctx.currentTime;
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now + i * 0.13);
+      gain.gain.setValueAtTime(0, now + i * 0.13);
+      gain.gain.linearRampToValueAtTime(0.28, now + i * 0.13 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.13 + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.13);
+      osc.stop(now + i * 0.13 + 0.5);
+    });
+  } catch (err) {
+    console.warn("Could not play alarm audio:", err);
+  }
+}
+
 /**
  * Main Dosemate Web Application with Local Persistence & Immediate Login Screen
  */
@@ -2209,6 +2241,23 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
+
+  const [activeAlarm, setActiveAlarm] = useState(null);
+  const [alarmSoundEnabled, setAlarmSoundEnabled] = useState(true);
+
+  function triggerInAppAlarm(tracker) {
+    setActiveAlarm(tracker);
+  }
+
+  // Looping audio chime while in-app alarm is active
+  useEffect(() => {
+    if (!activeAlarm || !alarmSoundEnabled) return;
+    playAlarmChime();
+    const interval = window.setInterval(() => {
+      playAlarmChime();
+    }, 3200);
+    return () => window.clearInterval(interval);
+  }, [activeAlarm, alarmSoundEnabled]);
 
   const [healthProfile, setHealthProfile] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -2334,6 +2383,7 @@ export default function App() {
           `Time for ${tracker.product_name}`,
           `Your ${tracker.daily_dose} unit daily dose is ready.`
         );
+        triggerInAppAlarm(tracker);
       }
       if (isLowOnStock(tracker)) {
         notifyOnce(
@@ -2925,6 +2975,27 @@ export default function App() {
               <span className="hidden sm:inline">
                 {notifications === "granted" ? "Alerts on" : "Alerts"}
               </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const sample = trackers[0] || {
+                  id: "sample-alarm",
+                  product_name: "Biotin Hair Gummies (No Added Sugar)",
+                  daily_dose: 2,
+                  meal_timing: "After breakfast",
+                  gummies_remaining: 56,
+                  reminder_enabled: true,
+                };
+                triggerInAppAlarm(sample);
+              }}
+              title="Test In-App Alarm with Sound"
+              aria-label="Test Alarm"
+              className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[#BFE3D3] dark:border-[#00E599]/40 bg-[#E3F2EC] dark:bg-[#00E599]/15 px-2.5 text-xs font-semibold text-[#163A2E] dark:text-[#00E599] transition hover:bg-[#D4EBDD] dark:hover:bg-[#00E599]/25 sm:h-9 sm:px-3"
+            >
+              <Volume2 size={14} className="text-[#388E6C] dark:text-[#00E599]" />
+              <span className="hidden sm:inline">Test Alarm</span>
             </button>
 
             <button
@@ -3767,6 +3838,106 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* In-App Alarm Modal Popup with Sound & Actions */}
+      {activeAlarm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          role="alertdialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#388E6C] dark:border-[#00E599] bg-white dark:bg-[#131A16] p-6 shadow-2xl sm:p-8">
+            {/* Top pulsing badge & sound toggle */}
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-[#00E599]/20 px-3 py-1 text-[11px] font-extrabold text-[#276B50] dark:text-[#00E599]">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E599] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E599]"></span>
+                </span>
+                DOSE ALARM RINGING
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setAlarmSoundEnabled(!alarmSoundEnabled)}
+                  title={alarmSoundEnabled ? "Mute sound" : "Unmute sound"}
+                  className="rounded-full p-1.5 text-[#5E736A] dark:text-[#8EA399] hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+                >
+                  {alarmSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveAlarm(null)}
+                  className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Ringing Visual */}
+            <div className="mt-5 text-center">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-inner">
+                <Bell size={38} className="animate-bounce" />
+              </div>
+              <h3 className="mt-4 text-xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
+                Time for your daily dose!
+              </h3>
+              <p className="mt-1 text-sm font-semibold text-[#388E6C] dark:text-[#00E599]">
+                {activeAlarm.product_name}
+              </p>
+              <p className="mt-0.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
+                Take {activeAlarm.daily_dose} unit ({activeAlarm.meal_timing || "After meal"}) · {activeAlarm.gummies_remaining ?? 60} left in bottle
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 space-y-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  void logDose(activeAlarm);
+                  setActiveAlarm(null);
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#388E6C] dark:bg-[#00E599] py-3.5 text-sm font-bold text-white dark:text-[#061810] shadow-md transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
+              >
+                <Check size={18} />
+                Mark as Taken &amp; Stop Alarm
+              </button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const tracker = activeAlarm;
+                    setActiveAlarm(null);
+                    showToast("Alarm snoozed for 5 minutes ⏰", "info");
+                    window.setTimeout(() => {
+                      triggerInAppAlarm(tracker);
+                    }, 5 * 60 * 1000);
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                >
+                  <Clock3 size={14} />
+                  Snooze 5 Min
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveAlarm(null);
+                    showToast("Alarm dismissed.", "info");
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                >
+                  <VolumeX size={14} />
+                  Dismiss
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
