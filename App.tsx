@@ -36,6 +36,23 @@ import {
   X,
   Youtube,
 } from "lucide-react";
+import {
+  auth,
+  googleProvider,
+  isFirebaseConfigured,
+  saveProfileToCloud,
+  saveTrackersToCloud,
+  saveLogsToCloud,
+  saveCheckupsToCloud,
+  subscribeToUserCloudData,
+} from "./firebase";
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 // App & Persistent Storage Configuration
 const STORAGE_PREFIX = "dosemate_wellness_v1";
@@ -2222,14 +2239,68 @@ export default function App() {
     return () => window.clearInterval(clock);
   }, []);
 
-  // Hydrate User Session Data from Local Storage on Login
+  // Persistent Firebase Authentication State Listener
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || "user@gmail.com",
+          displayName: firebaseUser.displayName || "",
+          photoURL: firebaseUser.photoURL || "",
+        });
+      } else {
+        // Only clear if not in an active guest session
+        setUser((prev) => (prev?.uid?.startsWith("guest_") ? prev : null));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Hydrate User Session Data (Cloud Firestore with Real-time Sync or Local Storage)
   useEffect(() => {
     if (!user?.uid) return;
-    setHealthProfile(loadStoredData(user.uid, "profile", null));
-    setTrackers(loadStoredData(user.uid, "trackers", []));
-    setLogs(loadStoredData(user.uid, "logs", []));
-    const storedCheckups = loadStoredData(user.uid, "checkups", null);
-    setCheckups(storedCheckups && storedCheckups.length > 0 ? storedCheckups : createSeedCheckups());
+
+    if (isFirebaseConfigured && !user.uid.startsWith("guest_")) {
+      // Real-time Firestore sync across all devices
+      const unsubscribe = subscribeToUserCloudData(user.uid, (cloudData) => {
+        if (cloudData.profile) {
+          setHealthProfile(cloudData.profile);
+          saveStoredData(user.uid, "profile", cloudData.profile);
+        } else {
+          const local = loadStoredData(user.uid, "profile", null);
+          if (local) setHealthProfile(local);
+        }
+        if (cloudData.trackers && cloudData.trackers.length > 0) {
+          setTrackers(cloudData.trackers);
+          saveStoredData(user.uid, "trackers", cloudData.trackers);
+        } else {
+          setTrackers(loadStoredData(user.uid, "trackers", []));
+        }
+        if (cloudData.logs && cloudData.logs.length > 0) {
+          setLogs(cloudData.logs);
+          saveStoredData(user.uid, "logs", cloudData.logs);
+        } else {
+          setLogs(loadStoredData(user.uid, "logs", []));
+        }
+        if (cloudData.checkups && cloudData.checkups.length > 0) {
+          setCheckups(cloudData.checkups);
+          saveStoredData(user.uid, "checkups", cloudData.checkups);
+        } else {
+          const stored = loadStoredData(user.uid, "checkups", null);
+          setCheckups(stored && stored.length > 0 ? stored : createSeedCheckups());
+        }
+      });
+      return () => unsubscribe();
+    } else {
+      // Local fallback for guest sessions or offline
+      setHealthProfile(loadStoredData(user.uid, "profile", null));
+      setTrackers(loadStoredData(user.uid, "trackers", []));
+      setLogs(loadStoredData(user.uid, "logs", []));
+      const storedCheckups = loadStoredData(user.uid, "checkups", null);
+      setCheckups(storedCheckups && storedCheckups.length > 0 ? storedCheckups : createSeedCheckups());
+    }
   }, [user?.uid]);
 
   // Scheduled Dose & Low-Stock Alert Trigger
@@ -2325,19 +2396,51 @@ export default function App() {
       return;
     }
 
-    startUserSession(cleanEmail);
-    showToast(
-      authMode === "signup"
-        ? "Account created! Complete your quick health profile."
-        : "Welcome back to Dosemate."
-    );
+    if (isFirebaseConfigured && auth) {
+      try {
+        if (authMode === "signup") {
+          await createUserWithEmailAndPassword(auth, cleanEmail, password);
+          showToast("Account created in cloud! Let's set up your profile.");
+        } else {
+          await signInWithEmailAndPassword(auth, cleanEmail, password);
+          showToast("Welcome back to Dosemate!");
+        }
+      } catch (err: any) {
+        console.error("Firebase auth error:", err);
+        if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+          showToast("Incorrect password or user not found. Try signing up instead.", "error");
+        } else if (err.code === "auth/email-already-in-use") {
+          showToast("Account exists with this email. Please sign in.", "error");
+        } else {
+          showToast(err.message?.replace("Firebase: ", "") || "Authentication failed.", "error");
+        }
+      }
+    } else {
+      // Local session simulation fallback
+      startUserSession(cleanEmail);
+      showToast(
+        authMode === "signup"
+          ? "Account created! Complete your quick health profile."
+          : "Welcome back to Dosemate."
+      );
+    }
     setAuthBusy(false);
   }
 
   async function signInWithGoogle() {
     setAuthBusy(true);
-    startUserSession("arjun.google@dosemate.app");
-    showToast("Signed in with Google!");
+    if (isFirebaseConfigured && auth) {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        showToast(`Signed in with Google as ${result.user.displayName || result.user.email}!`);
+      } catch (err: any) {
+        console.error("Google sign-in error:", err);
+        showToast(err.message?.replace("Firebase: ", "") || "Google sign-in cancelled or failed.", "error");
+      }
+    } else {
+      startUserSession("arjun.google@dosemate.app");
+      showToast("Signed in with Google (Local Mode)!");
+    }
     setAuthBusy(false);
   }
 
@@ -2358,6 +2461,13 @@ export default function App() {
   }
 
   async function signOut() {
+    if (isFirebaseConfigured && auth) {
+      try {
+        await firebaseSignOut(auth);
+      } catch (err) {
+        console.error("Firebase sign out error:", err);
+      }
+    }
     setUser(null);
     setHealthProfile(null);
     setTrackers([]);
@@ -2408,6 +2518,8 @@ export default function App() {
 
     setHealthProfile(profileData);
     saveStoredData(user.uid, "profile", profileData);
+    saveProfileToCloud(user.uid, profileData);
+    saveTrackersToCloud(user.uid, nextTrackers);
     setEditingProfile(false);
     setActiveTab("routine");
     showToast("Your personalized Dosemate regimen is ready!");
@@ -2418,6 +2530,7 @@ export default function App() {
     const updatedProfile = { ...healthProfile, avatarUrl: newAvatarUrl };
     setHealthProfile(updatedProfile);
     saveStoredData(user.uid, "profile", updatedProfile);
+    saveProfileToCloud(user.uid, updatedProfile);
 
     showToast(
       newAvatarUrl ? "Profile picture updated!" : "Profile picture reset to default.",
@@ -2594,6 +2707,7 @@ export default function App() {
 
     setTrackers(nextTrackers);
     saveStoredData(user.uid, "trackers", nextTrackers);
+    saveTrackersToCloud(user.uid, nextTrackers);
     setDialogOpen(false);
     setSaving(false);
   }
@@ -2617,6 +2731,8 @@ export default function App() {
       setTrackers(nextTrackers);
       saveStoredData(user.uid, "logs", nextLogs);
       saveStoredData(user.uid, "trackers", nextTrackers);
+      saveLogsToCloud(user.uid, nextLogs);
+      saveTrackersToCloud(user.uid, nextTrackers);
       showToast("Dose check-off undone.", "info");
     } else {
       if (tracker.gummies_remaining < tracker.daily_dose) {
@@ -2648,6 +2764,8 @@ export default function App() {
       setTrackers(nextTrackers);
       saveStoredData(user.uid, "logs", nextLogs);
       saveStoredData(user.uid, "trackers", nextTrackers);
+      saveLogsToCloud(user.uid, nextLogs);
+      saveTrackersToCloud(user.uid, nextTrackers);
       showToast("Dose checked off. Keep your streak alive!");
     }
 
@@ -2662,6 +2780,8 @@ export default function App() {
     setLogs(nextLogs);
     saveStoredData(user.uid, "trackers", nextTrackers);
     saveStoredData(user.uid, "logs", nextLogs);
+    saveTrackersToCloud(user.uid, nextTrackers);
+    saveLogsToCloud(user.uid, nextLogs);
     setDialogOpen(false);
     showToast("Product removed from routine.", "info");
   }
@@ -2671,6 +2791,7 @@ export default function App() {
     const nextCheckups = [newEntry, ...checkups];
     setCheckups(nextCheckups);
     saveStoredData(user.uid, "checkups", nextCheckups);
+    saveCheckupsToCloud(user.uid, nextCheckups);
     showToast(`Day ${newEntry.dayNumber} checkup saved!`);
   }
 
@@ -2679,6 +2800,7 @@ export default function App() {
     const nextCheckups = checkups.filter((item) => item.id !== id);
     setCheckups(nextCheckups);
     saveStoredData(user.uid, "checkups", nextCheckups);
+    saveCheckupsToCloud(user.uid, nextCheckups);
     showToast("Checkup entry removed.", "info");
   }
 
