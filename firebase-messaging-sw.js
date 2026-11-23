@@ -136,6 +136,16 @@ self.addEventListener("notificationclick", (event) => {
     return;
   }
 
+  if (action === "reorder") {
+    const url =
+      event.notification.data?.reorderUrl ||
+      "https://manmatters.com/home-alt?theme=reset&utm_source=google&utm_medium=brand&utm_campaign=Search_Brand_MM";
+    event.waitUntil(
+      self.clients.openWindow ? self.clients.openWindow(url) : Promise.resolve()
+    );
+    return;
+  }
+
   if (action === "snooze") {
     // Re-fire after 5 minutes
     self.setTimeout(() => {

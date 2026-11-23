@@ -91,7 +91,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 1,
     defaultTimes: ["09:00"],
     defaultMeal: "After meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/hair-gummies/154737",
   },
   {
     name: "Stage 2 Hair Growth Kit (Minoxidil 5% + Biotin)",
@@ -99,7 +99,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 2,
     defaultTimes: ["09:00", "21:00"],
     defaultMeal: "After meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/minoxidil-5/154740",
   },
   {
     name: "Pure Himalayan Shilajit Gummies",
@@ -107,7 +107,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 2,
     defaultTimes: ["08:30", "17:00"],
     defaultMeal: "After meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/pure-himalayan-shilajit-resin-20g/8762747",
   },
   {
     name: "Melatonin Deep Sleep Gummies",
@@ -115,7 +115,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 1,
     defaultTimes: ["22:00"],
     defaultMeal: "After meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/sleep-gummies/154745",
   },
   {
     name: "BeardMax Beard Growth Serum (Redensyl)",
@@ -123,7 +123,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 1,
     defaultTimes: ["21:30"],
     defaultMeal: "Before meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/beardmax-5-minoxidil/154749",
   },
   {
     name: "Apple Cider Vinegar Weight Management Gummies",
@@ -131,7 +131,7 @@ const MAN_MATTERS_GUMMY_PRESETS = [
     defaultDose: 2,
     defaultTimes: ["08:30", "13:00"],
     defaultMeal: "Before meal",
-    reorderUrl: "https://man.matters",
+    reorderUrl: "https://manmatters.com/dp/apple-cider-vinegar-gummies/154747",
   },
 ];
 
@@ -149,7 +149,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "14.2k",
     price: 499,
     mrp: 699,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/hair-gummies/154737",
   },
   {
     id: "prod-minoxidil-5",
@@ -164,7 +164,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "9.8k",
     price: 649,
     mrp: 899,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/minoxidil-5/154740",
   },
   {
     id: "prod-redensyl-tonic",
@@ -179,7 +179,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "6.4k",
     price: 599,
     mrp: 799,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/beardmax-5-minoxidil/154749",
   },
   {
     id: "prod-shilajit-gummies",
@@ -194,7 +194,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "11.5k",
     price: 549,
     mrp: 749,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/pure-himalayan-shilajit-resin-20g/8762747",
   },
   {
     id: "prod-beard-serum",
@@ -209,7 +209,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "5.1k",
     price: 449,
     mrp: 599,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/beardmax-5-minoxidil/154749",
   },
   {
     id: "prod-sleep-gummies",
@@ -224,7 +224,7 @@ const MAN_MATTERS_PRODUCTS = [
     reviews: "7.3k",
     price: 399,
     mrp: 549,
-    url: "https://man.matters",
+    url: "https://manmatters.com/dp/sleep-gummies/154745",
   },
 ];
 
@@ -257,6 +257,28 @@ function daysRemaining(tracker) {
 function isLowOnStock(tracker) {
   const threshold = Number(tracker?.reorder_threshold ?? 7);
   return daysRemaining(tracker) <= threshold;
+}
+
+const MAN_MATTERS_CAMPAIGN_URL =
+  "https://manmatters.com/home-alt?theme=reset&utm_source=google&utm_medium=brand&utm_campaign=Search_Brand_MM&utm_source=google_Search&utm_medium=180290939936&utm_campaign=753311585718&utm_term=man%20matters&gad_source=1&gad_campaignid=22580437328&gbraid=0AAAAA-2S6Ud-GmneGNC4Wl-VmRHwtAu8G&gclid=Cj0KCQiA2frXBhC_ARIsAPTFcdN00Zz_PXrFdt6IdPBdmuZ3M6aCGbczbeRyNnmAPuGjMe-nOPzQDeUaAkvgEALw_wcB";
+
+function getReorderLink(tracker) {
+  if (!tracker) return MAN_MATTERS_CAMPAIGN_URL;
+  if (
+    tracker.reorder_url &&
+    tracker.reorder_url.trim() &&
+    tracker.reorder_url !== "https://man.matters"
+  ) {
+    return tracker.reorder_url;
+  }
+  const name = (tracker.product_name || "").toLowerCase();
+  if (name.includes("biotin")) return "https://manmatters.com/dp/hair-gummies/154737";
+  if (name.includes("minoxidil")) return "https://manmatters.com/dp/minoxidil-5/154740";
+  if (name.includes("shilajit")) return "https://manmatters.com/dp/pure-himalayan-shilajit-resin-20g/8762747";
+  if (name.includes("sleep") || name.includes("melatonin")) return "https://manmatters.com/dp/sleep-gummies/154745";
+  if (name.includes("beard")) return "https://manmatters.com/dp/beardmax-5-minoxidil/154749";
+  if (name.includes("apple cider") || name.includes("acv")) return "https://manmatters.com/dp/apple-cider-vinegar-gummies/154747";
+  return MAN_MATTERS_CAMPAIGN_URL;
 }
 
 function generateHairSnapshotSvg(stage = "day1") {
@@ -2287,6 +2309,8 @@ export default function App() {
   const [notifications, setNotifications] = useState("unsupported");
   const [toasts, setToasts] = useState([]);
   const sentNotificationsRef = useRef(new Set());
+  const [lowStockPopupTracker, setLowStockPopupTracker] = useState(null);
+  const dismissedLowStockIdsRef = useRef(new Set());
 
   function showToast(message, type = "success") {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -2399,12 +2423,27 @@ export default function App() {
       if (isLowOnStock(tracker)) {
         notifyOnce(
           `stock-${tracker.id}-${today}`,
-          `${tracker.product_name} is running low`,
-          `About ${daysRemaining(tracker)} days left. Reorder on Man Matters soon.`
+          `⚠️ Low Supply: ${tracker.product_name}`,
+          `Only ${tracker.gummies_remaining} units left (${daysRemaining(tracker)} days remaining). Tap to reorder now.`,
+          tracker
         );
       }
     }
   }, [user?.uid, minute, today, trackers, logs, notifications]);
+
+  // Check for low stock and trigger popup reorder dialog if not dismissed in session
+  useEffect(() => {
+    if (!trackers.length || !healthProfile || activeAlarm || lowStockPopupTracker) return;
+    const firstLow = trackers.find(
+      (t) => isLowOnStock(t) && !dismissedLowStockIdsRef.current.has(t.id)
+    );
+    if (firstLow) {
+      const timer = window.setTimeout(() => {
+        setLowStockPopupTracker(firstLow);
+      }, 1200);
+      return () => window.clearTimeout(timer);
+    }
+  }, [trackers, healthProfile, activeAlarm, lowStockPopupTracker]);
 
   // ── Sync alarm schedule to Service Worker whenever trackers change ───────
   // This lets the SW fire OS notifications even when the tab is in background.
@@ -2676,11 +2715,48 @@ export default function App() {
     );
   }
 
-  function notifyOnce(key, title, body) {
+  function notifyOnce(key, title, body, tracker = null) {
     if (notifications !== "granted") return;
     const storageKey = `${user?.uid}:${key}`;
     if (sentNotificationsRef.current.has(storageKey)) return;
-    new Notification(title, { body });
+
+    const reorderLink = tracker ? getReorderLink(tracker) : null;
+    const isLow = tracker ? isLowOnStock(tracker) : false;
+
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.showNotification(title, {
+          body,
+          icon: "/icon-192.png",
+          badge: "/icon-192.png",
+          vibrate: [300, 100, 300, 100, 400],
+          requireInteraction: isLow,
+          tag: storageKey,
+          data: {
+            trackerId: tracker?.id,
+            reorderUrl: reorderLink,
+            url: reorderLink || "/",
+          },
+          actions: isLow
+            ? [
+                { action: "reorder", title: "🛒 Reorder Now" },
+                { action: "dismiss", title: "Dismiss" },
+              ]
+            : [
+                { action: "take", title: "✅ Take Dose" },
+                { action: "out_2h", title: "🏃 I'm Out (+2 hrs)" },
+                { action: "snooze", title: "⏰ Snooze 5m" },
+              ],
+        });
+      });
+    } else {
+      const n = new Notification(title, { body });
+      if (reorderLink && isLow) {
+        n.onclick = () => {
+          window.open(reorderLink, "_blank");
+        };
+      }
+    }
     sentNotificationsRef.current.add(storageKey);
   }
 
@@ -2914,6 +2990,18 @@ export default function App() {
       saveLogsToCloud(user.uid, nextLogs);
       saveTrackersToCloud(user.uid, nextTrackers);
       showToast("Dose checked off. Keep your streak alive!");
+
+      // If dose made stock low, trigger reorder popup
+      const updatedTracker = nextTrackers.find((t) => t.id === tracker.id);
+      if (
+        updatedTracker &&
+        isLowOnStock(updatedTracker) &&
+        !dismissedLowStockIdsRef.current.has(updatedTracker.id)
+      ) {
+        window.setTimeout(() => {
+          setLowStockPopupTracker(updatedTracker);
+        }, 700);
+      }
     }
 
     setWorkingId(null);
@@ -3277,18 +3365,18 @@ export default function App() {
               </div>
             </section>
 
-            {/* Low-Stock Alert Banner */}
+            {/* Low-Stock Alert Banner with Quick Order Again CTA */}
             {lowTrackers.length > 0 && (
-              <section className="flex items-center justify-between gap-4 rounded-2xl border border-[#F5D6CE] bg-[#FDF6F4] p-4 shadow-2xs">
+              <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[#F5D6CE] dark:border-[#4A2024] bg-[#FDF6F4] dark:bg-[#201515] p-4 shadow-2xs">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE5DF] text-[#C94F32]">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE5DF] dark:bg-[#381A1D] text-[#C94F32]">
                     <PackageCheck size={20} />
                   </span>
                   <div>
-                    <p className="text-xs font-bold text-[#9C331C]">
+                    <p className="text-xs font-bold text-[#9C331C] dark:text-[#FFA085]">
                       Low supply alert — reorder soon
                     </p>
-                    <p className="mt-0.5 text-xs text-[#6B4A43]">
+                    <p className="mt-0.5 text-xs text-[#6B4A43] dark:text-[#D4A5A0]">
                       {lowTrackers
                         .map(
                           (tracker) =>
@@ -3300,9 +3388,18 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-                <span className="hidden text-[#C94F32] sm:inline">
-                  <ArrowDown size={16} />
-                </span>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setLowStockPopupTracker(lowTrackers[0])}
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#C94F32] hover:bg-[#B54434] text-white px-3.5 py-2 text-xs font-bold shadow-2xs transition"
+                  >
+                    <ShoppingBag size={14} />
+                    <span>Order Again</span>
+                    <ArrowUpRight size={13} />
+                  </button>
+                </div>
               </section>
             )}
 
@@ -3503,12 +3600,12 @@ export default function App() {
                               : "Take dose"}
                           </button>
 
-                          {tracker.reorder_url && low && (
+                          {low && (
                             <a
-                              href={tracker.reorder_url}
+                              href={getReorderLink(tracker)}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] bg-white dark:bg-[#131A16] px-3.5 py-2.5 text-xs font-bold text-[#B54434] transition hover:bg-[#FCECE8]"
+                              className="inline-flex items-center gap-1 rounded-xl border border-[#F5C6BA] dark:border-[#4A2024] bg-[#FDF6F4] dark:bg-[#201515] px-3.5 py-2.5 text-xs font-bold text-[#B54434] dark:text-[#FFA085] transition hover:bg-[#FCECE8] dark:hover:bg-[#301A1A]"
                             >
                               Reorder <ArrowUpRight size={14} />
                             </a>
@@ -4245,6 +4342,107 @@ export default function App() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* Low Stock Reorder Popup Dialog with Direct Link */}
+      {lowStockPopupTracker && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#E86F52] bg-white dark:bg-[#131A16] p-6 shadow-2xl sm:p-8">
+            {/* Top Badge & Close */}
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FCECE8] dark:bg-[#E86F52]/20 px-3 py-1 text-[11px] font-extrabold text-[#C94F32] dark:text-[#FFA085]">
+                <PackageCheck size={14} />
+                LOW SUPPLY WARNING
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  dismissedLowStockIdsRef.current.add(lowStockPopupTracker.id);
+                  setLowStockPopupTracker(null);
+                }}
+                className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Visual illustration & Details */}
+            <div className="mt-5 text-center">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#FCECE8] dark:bg-[#E86F52]/15 text-[#C94F32] dark:text-[#FFA085] shadow-inner">
+                <ShoppingBag size={38} className="animate-pulse" />
+              </div>
+              <h3 className="mt-4 text-xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
+                Your supply is running out!
+              </h3>
+              <p className="mt-1 text-sm font-bold text-[#C94F32] dark:text-[#FFA085]">
+                {lowStockPopupTracker.product_name}
+              </p>
+              <div className="mt-2.5 inline-flex items-center gap-2 rounded-xl bg-[#F9FBFA] dark:bg-[#1A2520] border border-[#EAEFEA] dark:border-[#22332A] px-3.5 py-1.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
+                <span>
+                  Only <strong>{lowStockPopupTracker.gummies_remaining} units left</strong>
+                </span>
+                <span>·</span>
+                <span className="text-[#C94F32] font-semibold">
+                  ~{daysRemaining(lowStockPopupTracker)} {daysRemaining(lowStockPopupTracker) === 1 ? "day" : "days"} remaining
+                </span>
+              </div>
+              <p className="mt-3.5 text-xs text-[#5E736A] dark:text-[#8EA399] leading-relaxed">
+                Consistency is crucial! Men&apos;s wellness routines require continuous daily intake to see real results. Reorder your bottle now so your regimen doesn&apos;t stop.
+              </p>
+            </div>
+
+            {/* Actions: Direct Link to Order Again */}
+            <div className="mt-6 space-y-2.5">
+              <a
+                href={getReorderLink(lowStockPopupTracker)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => {
+                  showToast("Opening Man Matters store to reorder…");
+                  dismissedLowStockIdsRef.current.add(lowStockPopupTracker.id);
+                  setLowStockPopupTracker(null);
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C94F32] hover:bg-[#B54434] py-3.5 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
+              >
+                <ShoppingBag size={18} />
+                <span>Order Again on Man Matters</span>
+                <ArrowUpRight size={16} />
+              </a>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const id = lowStockPopupTracker.id;
+                    void updateTrackerStock(id, (lowStockPopupTracker.gummies_remaining || 0) + 30);
+                    dismissedLowStockIdsRef.current.add(id);
+                    setLowStockPopupTracker(null);
+                    showToast("Stock refilled (+30 units)!");
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                >
+                  <RotateCcw size={14} />
+                  Refilled (+30)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    dismissedLowStockIdsRef.current.add(lowStockPopupTracker.id);
+                    setLowStockPopupTracker(null);
+                    showToast("We'll remind you again tomorrow.", "info");
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                >
+                  Remind later
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
