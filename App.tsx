@@ -47,6 +47,11 @@ import {
   saveLogsToCloud,
   saveCheckupsToCloud,
   subscribeToUserCloudData,
+  requestFCMToken,
+  saveFCMTokenToCloud,
+  sendFirebaseConfigToSW,
+  syncAlarmsToSW,
+  onFCMMessage,
 } from "./firebase";
 import {
   signInWithPopup,
@@ -2244,20 +2249,26 @@ export default function App() {
 
   const [activeAlarm, setActiveAlarm] = useState(null);
   const [alarmSoundEnabled, setAlarmSoundEnabled] = useState(true);
+  const [alarmView, setAlarmView] = useState("ring"); // 'ring' | 'out_picker'
+  const [outHoursChoice, setOutHoursChoice] = useState(2);
+  const [customOutTime, setCustomOutTime] = useState("");
+  const [editingStockTrackerId, setEditingStockTrackerId] = useState(null);
+  const [customStockInput, setCustomStockInput] = useState("");
 
   function triggerInAppAlarm(tracker) {
     setActiveAlarm(tracker);
+    setAlarmView("ring");
   }
 
-  // Looping audio chime while in-app alarm is active
+  // Looping audio chime while in-app alarm is active and on ringing view
   useEffect(() => {
-    if (!activeAlarm || !alarmSoundEnabled) return;
+    if (!activeAlarm || !alarmSoundEnabled || alarmView !== "ring") return;
     playAlarmChime();
     const interval = window.setInterval(() => {
       playAlarmChime();
     }, 3200);
     return () => window.clearInterval(interval);
-  }, [activeAlarm, alarmSoundEnabled]);
+  }, [activeAlarm, alarmSoundEnabled, alarmView]);
 
   const [healthProfile, setHealthProfile] = useState(null);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -2394,6 +2405,61 @@ export default function App() {
       }
     }
   }, [user?.uid, minute, today, trackers, logs, notifications]);
+
+  // ── Sync alarm schedule to Service Worker whenever trackers change ───────
+  // This lets the SW fire OS notifications even when the tab is in background.
+  useEffect(() => {
+    if (!trackers.length || !("serviceWorker" in navigator)) return;
+    const alarms = trackers
+      .filter((t) => t.reminder_enabled && t.reminder_time)
+      .map((t) => {
+        const schedules =
+          Array.isArray(t.dose_schedules) && t.dose_schedules.length > 0
+            ? t.dose_schedules
+            : [{ time: t.reminder_time.slice(0, 5) }];
+        return schedules.map((s) => ({
+          id: `${t.id}-${s.time.slice(0, 5)}`,
+          productName: t.product_name,
+          time: s.time.slice(0, 5),
+          dailyDose: t.daily_dose,
+          mealTiming: s.meal || t.meal_timing || "After meal",
+          remaining: t.gummies_remaining,
+        }));
+      })
+      .flat();
+    void syncAlarmsToSW(alarms);
+  }, [trackers]);
+
+  // ── Listen for FCM foreground messages & dose-taken events from SW ───────
+  useEffect(() => {
+    // FCM foreground: show in-app alarm when push arrives while tab is open
+    const unsubFCM = onFCMMessage((payload) => {
+      const tracker = trackers.find(
+        (t) => payload?.data?.trackerId === t.id
+      ) || {
+        id: payload?.data?.trackerId || "fcm",
+        product_name: payload?.notification?.title || "Your Supplement",
+        daily_dose: 1,
+        meal_timing: "After meal",
+        gummies_remaining: 0,
+      };
+      triggerInAppAlarm(tracker);
+    });
+
+    // Service Worker → App: dose taken from notification while tab was in background
+    const handleSWMessage = (event: MessageEvent) => {
+      if (event.data?.type === "DOSE_TAKEN_FROM_NOTIFICATION") {
+        const tracker = trackers.find((t) => t.id === event.data.trackerId);
+        if (tracker) void logDose(tracker);
+      }
+    };
+    navigator.serviceWorker?.addEventListener("message", handleSWMessage);
+
+    return () => {
+      unsubFCM();
+      navigator.serviceWorker?.removeEventListener("message", handleSWMessage);
+    };
+  }, [trackers]);
 
   const dosesToday = useMemo(
     () =>
@@ -2631,7 +2697,16 @@ export default function App() {
     const permission = await Notification.requestPermission();
     setNotifications(permission);
     if (permission === "granted") {
-      showToast("Alerts are on while Dosemate is open.");
+      showToast("Alerts enabled! You'll get alarms even when this tab is in the background.");
+      // ── Send Firebase config to SW & request FCM token ──────────────────
+      void sendFirebaseConfigToSW();
+      if (user?.uid) {
+        const token = await requestFCMToken();
+        if (token) {
+          void saveFCMTokenToCloud(user.uid, token);
+          console.log("[Dosemate] FCM token saved:", token.slice(0, 20) + "…");
+        }
+      }
     } else {
       showToast("Allow notifications in your browser settings.", "info");
     }
@@ -2856,6 +2931,76 @@ export default function App() {
     saveLogsToCloud(user.uid, nextLogs);
     setDialogOpen(false);
     showToast("Product removed from routine.", "info");
+  }
+
+  async function updateTrackerStock(trackerId, newCount) {
+    if (!user?.uid) return;
+    const count = Math.max(0, Number(newCount) || 0);
+    const nextTrackers = trackers.map((t) =>
+      t.id === trackerId ? { ...t, gummies_remaining: count } : t
+    );
+    setTrackers(nextTrackers);
+    saveStoredData(user.uid, "trackers", nextTrackers);
+    saveTrackersToCloud(user.uid, nextTrackers);
+    setEditingStockTrackerId(null);
+    showToast(`Bottle supply updated to ${count} units!`);
+  }
+
+  function getPreviewReturnTime(hours, customTime) {
+    if (customTime) {
+      return `${customTime} today`;
+    }
+    const d = new Date(Date.now() + hours * 3600 * 1000);
+    return `${d.toTimeString().slice(0, 5)} (in ${hours} ${hours === 1 ? "hour" : "hours"})`;
+  }
+
+  function handleSetReturnReminder() {
+    if (!activeAlarm) return;
+    const tracker = activeAlarm;
+
+    let delayMs = outHoursChoice * 60 * 60 * 1000;
+    let targetTimeString = "";
+
+    if (customOutTime) {
+      const [h, m] = customOutTime.split(":").map(Number);
+      const now = new Date();
+      const target = new Date();
+      target.setHours(h, m, 0, 0);
+      if (target.getTime() <= now.getTime()) {
+        target.setDate(target.getDate() + 1);
+      }
+      delayMs = Math.max(60000, target.getTime() - now.getTime());
+      targetTimeString = customOutTime;
+    } else {
+      const target = new Date(Date.now() + delayMs);
+      targetTimeString = target.toTimeString().slice(0, 5);
+    }
+
+    setActiveAlarm(null);
+    setAlarmView("ring");
+
+    showToast(`Reminder set! We'll alert you at ${targetTimeString} when you're back home. 🏠`);
+
+    // In-app delayed alert
+    window.setTimeout(() => {
+      triggerInAppAlarm({
+        ...tracker,
+        meal_timing: `Back home reminder (postponed)`,
+      });
+    }, delayMs);
+
+    // Schedule with Service Worker if available
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.active?.postMessage({
+          type: "SCHEDULE_POSTPONED_ALARM",
+          trackerId: tracker.id,
+          productName: tracker.product_name,
+          delayMs,
+          timeString: targetTimeString,
+        });
+      });
+    }
   }
 
   async function handleAddCheckup(newEntry) {
@@ -3267,13 +3412,66 @@ export default function App() {
                           {/* Bottle Supply Progress Bar */}
                           <div className="mt-4">
                             <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold">
-                              <span className="text-[#667B72] dark:text-[#7D9489]">
-                                {tracker.gummies_remaining} units left in bottle
+                              <span className="text-[#667B72] dark:text-[#7D9489] flex items-center gap-1.5">
+                                <span>{tracker.gummies_remaining} units left</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingStockTrackerId(
+                                      editingStockTrackerId === tracker.id ? null : tracker.id
+                                    );
+                                    setCustomStockInput(String(tracker.gummies_remaining));
+                                  }}
+                                  className="text-[10px] text-[#388E6C] dark:text-[#00E599] underline hover:opacity-80 transition cursor-pointer"
+                                >
+                                  {editingStockTrackerId === tracker.id ? "Close" : "Set count"}
+                                </button>
                               </span>
                               <span className={low ? "text-[#C94F32]" : "text-[#388E6C] dark:text-[#00E599]"}>
                                 {days} {days === 1 ? "day" : "days"} left
                               </span>
                             </div>
+
+                            {/* Quick Select Stock Drawer / Chips */}
+                            {editingStockTrackerId === tracker.id && (
+                              <div className="my-2.5 p-2 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] flex flex-wrap items-center gap-1.5 animate-in fade-in duration-150">
+                                <span className="text-[10px] font-bold text-[#566B62] dark:text-[#8EA399] mr-0.5">
+                                  Quick set:
+                                </span>
+                                {[15, 30, 45, 60, 90].map((preset) => (
+                                  <button
+                                    key={preset}
+                                    type="button"
+                                    onClick={() => void updateTrackerStock(tracker.id, preset)}
+                                    className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
+                                      tracker.gummies_remaining === preset
+                                        ? "bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810]"
+                                        : "bg-white dark:bg-[#131A16] border border-[#DCE5DF] dark:border-[#2A3F34] text-[#1A2B24] dark:text-[#F1F5F3] hover:border-[#388E6C]"
+                                    }`}
+                                  >
+                                    {preset}
+                                  </button>
+                                ))}
+                                <div className="flex items-center gap-1 ml-auto">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="365"
+                                    value={customStockInput}
+                                    onChange={(e) => setCustomStockInput(e.target.value)}
+                                    className="w-12 px-1.5 py-0.5 rounded-lg border border-[#DCE5DF] dark:border-[#2A3F34] bg-white dark:bg-[#131A16] text-xs text-center text-[#1A2B24] dark:text-[#F1F5F3] outline-none"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => void updateTrackerStock(tracker.id, customStockInput)}
+                                    className="px-2 py-0.5 rounded-lg bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] text-[10px] font-bold"
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="h-2 w-full overflow-hidden rounded-full bg-[#E6ECE9]">
                               <div
                                 className={`h-full rounded-full transition-all duration-300 ${
@@ -3849,95 +4047,204 @@ export default function App() {
           aria-modal="true"
         >
           <div className="relative w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#388E6C] dark:border-[#00E599] bg-white dark:bg-[#131A16] p-6 shadow-2xl sm:p-8">
-            {/* Top pulsing badge & sound toggle */}
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-[#00E599]/20 px-3 py-1 text-[11px] font-extrabold text-[#276B50] dark:text-[#00E599]">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E599] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E599]"></span>
-                </span>
-                DOSE ALARM RINGING
-              </span>
+            {alarmView === "ring" ? (
+              <>
+                {/* Top pulsing badge & sound toggle */}
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-[#00E599]/20 px-3 py-1 text-[11px] font-extrabold text-[#276B50] dark:text-[#00E599]">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E599] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E599]"></span>
+                    </span>
+                    DOSE ALARM RINGING
+                  </span>
 
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setAlarmSoundEnabled(!alarmSoundEnabled)}
-                  title={alarmSoundEnabled ? "Mute sound" : "Unmute sound"}
-                  className="rounded-full p-1.5 text-[#5E736A] dark:text-[#8EA399] hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
-                >
-                  {alarmSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveAlarm(null)}
-                  className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
-                >
-                  <X size={18} />
-                </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setAlarmSoundEnabled(!alarmSoundEnabled)}
+                      title={alarmSoundEnabled ? "Mute sound" : "Unmute sound"}
+                      className="rounded-full p-1.5 text-[#5E736A] dark:text-[#8EA399] hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+                    >
+                      {alarmSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveAlarm(null);
+                        setAlarmView("ring");
+                      }}
+                      className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Ringing Visual */}
+                <div className="mt-5 text-center">
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-inner">
+                    <Bell size={38} className="animate-bounce" />
+                  </div>
+                  <h3 className="mt-4 text-xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
+                    Time for your daily dose!
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-[#388E6C] dark:text-[#00E599]">
+                    {activeAlarm.product_name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
+                    Take {activeAlarm.daily_dose} unit ({activeAlarm.meal_timing || "After meal"}) · {activeAlarm.gummies_remaining ?? 60} left in bottle
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void logDose(activeAlarm);
+                      setActiveAlarm(null);
+                      setAlarmView("ring");
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#388E6C] dark:bg-[#00E599] py-3.5 text-sm font-bold text-white dark:text-[#061810] shadow-md transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
+                  >
+                    <Check size={18} />
+                    Mark as Taken &amp; Stop Alarm
+                  </button>
+
+                  {/* I'm Out · Notify Later Option */}
+                  <button
+                    type="button"
+                    onClick={() => setAlarmView("out_picker")}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#388E6C]/30 dark:border-[#00E599]/30 bg-[#E3F2EC] dark:bg-[#00E599]/15 py-3 text-xs font-bold text-[#163A2E] dark:text-[#00E599] hover:bg-[#D4EBDD] dark:hover:bg-[#00E599]/25 transition"
+                  >
+                    <span>🏃 I&apos;m Out · Notify Me Later</span>
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tracker = activeAlarm;
+                        setActiveAlarm(null);
+                        setAlarmView("ring");
+                        showToast("Alarm snoozed for 5 minutes ⏰", "info");
+                        window.setTimeout(() => {
+                          triggerInAppAlarm(tracker);
+                        }, 5 * 60 * 1000);
+                      }}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                    >
+                      <Clock3 size={14} />
+                      Snooze 5 Min
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveAlarm(null);
+                        setAlarmView("ring");
+                        showToast("Alarm dismissed.", "info");
+                      }}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
+                    >
+                      <VolumeX size={14} />
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* I'm Out · Return Reminder Time Selection */
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setAlarmView("ring")}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] hover:text-[#1A2B24] dark:hover:text-white transition"
+                  >
+                    <ArrowLeft size={14} />
+                    <span>Back to Alarm</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveAlarm(null);
+                      setAlarmView("ring");
+                    }}
+                    className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1E2C25] transition"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="mt-3 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E3F2EC] dark:bg-[#00E599]/15 text-3xl shadow-inner">
+                    🏃
+                  </div>
+                  <h3 className="mt-3 text-xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
+                    Away from home?
+                  </h3>
+                  <p className="mt-1 text-xs text-[#5E736A] dark:text-[#8EA399]">
+                    We&apos;ll pause this alarm and alert you again as soon as you return.
+                  </p>
+                </div>
+
+                <div className="mt-5 space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA] mb-1.5">
+                      Remind me after:
+                    </label>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {[1, 2, 3, 4].map((hrs) => {
+                        const active = outHoursChoice === hrs && !customOutTime;
+                        return (
+                          <button
+                            key={hrs}
+                            type="button"
+                            onClick={() => {
+                              setOutHoursChoice(hrs);
+                              setCustomOutTime("");
+                            }}
+                            className={`py-2 rounded-xl text-xs font-bold border transition ${
+                              active
+                                ? "border-[#388E6C] dark:border-[#00E599] bg-[#388E6C] dark:bg-[#00E599] text-white dark:text-[#061810] shadow-sm"
+                                : "border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] text-[#1A2B24] dark:text-[#F1F5F3] hover:border-[#388E6C]"
+                            }`}
+                          >
+                            +{hrs} {hrs === 1 ? "hr" : "hrs"}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#3E4C59] dark:text-[#A0B4AA]">
+                      Or pick exact return time:
+                    </label>
+                    <input
+                      type="time"
+                      value={customOutTime}
+                      onChange={(e) => setCustomOutTime(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-[#D5DCE4] dark:border-[#25382E] bg-[#F7F8FA] dark:bg-[#17201C] px-3.5 py-2.5 text-xs text-[#141A21] dark:text-[#F1F5F3] outline-none transition focus:border-[#388E6C] dark:focus:border-[#00E599]"
+                    />
+                  </div>
+
+                  <div className="rounded-xl border border-[#BFE3D3] dark:border-[#00E599]/30 bg-[#F0F7F4] dark:bg-[#13221B] p-2.5 text-center text-xs font-bold text-[#276B50] dark:text-[#00E599]">
+                    ⏰ We will remind you at: <span className="underline">{getPreviewReturnTime(outHoursChoice, customOutTime)}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSetReturnReminder}
+                    className="w-full rounded-2xl bg-[#388E6C] dark:bg-[#00E599] py-3.5 text-sm font-bold text-white dark:text-[#061810] shadow-md transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
+                  >
+                    Set Return Reminder &amp; Silence
+                  </button>
+                </div>
               </div>
-            </div>
-
-            {/* Ringing Visual */}
-            <div className="mt-5 text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E3F2EC] dark:bg-[#00E599]/15 text-[#388E6C] dark:text-[#00E599] shadow-inner">
-                <Bell size={38} className="animate-bounce" />
-              </div>
-              <h3 className="mt-4 text-xl font-extrabold tracking-tight text-[#1A2B24] dark:text-[#F1F5F3]">
-                Time for your daily dose!
-              </h3>
-              <p className="mt-1 text-sm font-semibold text-[#388E6C] dark:text-[#00E599]">
-                {activeAlarm.product_name}
-              </p>
-              <p className="mt-0.5 text-xs text-[#5E736A] dark:text-[#8EA399]">
-                Take {activeAlarm.daily_dose} unit ({activeAlarm.meal_timing || "After meal"}) · {activeAlarm.gummies_remaining ?? 60} left in bottle
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-6 space-y-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  void logDose(activeAlarm);
-                  setActiveAlarm(null);
-                }}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#388E6C] dark:bg-[#00E599] py-3.5 text-sm font-bold text-white dark:text-[#061810] shadow-md transition hover:bg-[#2E775A] dark:hover:bg-[#00CC88]"
-              >
-                <Check size={18} />
-                Mark as Taken &amp; Stop Alarm
-              </button>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const tracker = activeAlarm;
-                    setActiveAlarm(null);
-                    showToast("Alarm snoozed for 5 minutes ⏰", "info");
-                    window.setTimeout(() => {
-                      triggerInAppAlarm(tracker);
-                    }, 5 * 60 * 1000);
-                  }}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#1A2B24] dark:text-[#F1F5F3] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
-                >
-                  <Clock3 size={14} />
-                  Snooze 5 Min
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveAlarm(null);
-                    showToast("Alarm dismissed.", "info");
-                  }}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#DCE5DF] dark:border-[#22332A] bg-[#F9FBFA] dark:bg-[#17201C] py-2.5 text-xs font-bold text-[#5E736A] dark:text-[#8EA399] hover:bg-[#EAEFEA] dark:hover:bg-[#25382E] transition"
-                >
-                  <VolumeX size={14} />
-                  Dismiss
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}
