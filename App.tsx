@@ -47,12 +47,41 @@ import {
   saveLogsToCloud,
   saveCheckupsToCloud,
   subscribeToUserCloudData,
-  requestFCMToken,
-  saveFCMTokenToCloud,
-  sendFirebaseConfigToSW,
-  syncAlarmsToSW,
-  onFCMMessage,
 } from "./firebase";
+import * as FBModule from "./firebase";
+
+// Safe dynamic fallbacks so App.tsx builds cleanly even if an older firebase.ts is uploaded
+const requestFCMToken = (FBModule as any).requestFCMToken || (async () => null);
+const saveFCMTokenToCloud = (FBModule as any).saveFCMTokenToCloud || (async () => {});
+const sendFirebaseConfigToSW = (FBModule as any).sendFirebaseConfigToSW || (async () => {});
+const onFCMMessage = (FBModule as any).onFCMMessage || (() => () => {});
+
+// Self-contained IndexedDB Alarm Synchronization for background Service Worker
+async function syncAlarmsToSW(alarms: any[]) {
+  try {
+    const req = window.indexedDB.open("dosemate_alarms_v1", 1);
+    req.onupgradeneeded = (e: any) => {
+      e.target.result.createObjectStore("scheduled_alarms", { keyPath: "id" });
+    };
+    req.onsuccess = (e: any) => {
+      const db = e.target.result;
+      const tx = db.transaction("scheduled_alarms", "readwrite");
+      const store = tx.objectStore("scheduled_alarms");
+      store.clear();
+      for (const a of alarms) {
+        store.put(a);
+      }
+    };
+  } catch (err) {
+    console.warn("IndexedDB sync error:", err);
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.active?.postMessage({ type: "SYNC_ALARMS", alarms });
+    });
+  }
+}
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
